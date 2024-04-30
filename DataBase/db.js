@@ -1,7 +1,17 @@
 const mongoose = require('mongoose');
 
-const db = mongoose.connect('mongodb://localhost/FoodieBlog',{
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+
+// Production
+const db = mongoose.connect(process.env.DATABASE_URL,{
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 module.exports = db
+
+
+// Local Dev
+// const db = mongoose.connect('mongodb://localhost/FoodieBlog',{
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//   });
+// module.exports = db
