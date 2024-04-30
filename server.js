@@ -4,8 +4,8 @@ const logger = require('morgan');
 require('dotenv').config()
 require('./DataBase/index');
 const route = require('./Routes/routes');
-
-const PORT = process.env.PORT || 8000;
+const mongoose = require('mongoose');
+const PORT = process.env.PORT || 8670;
 const app = express();
 
 // Body Parser Middleware
@@ -28,6 +28,14 @@ app.use((req, res, next) => {
 
 app.use(route);
 
+
 app.listen(PORT, () => {
-console.log(`Server started on port ${PORT}`);
+    console.log(`Server started on port ${PORT}`);
+});
+mongoose.connect(process.env.DATABASE_URL)
+.then(() => {
+  console.log("Database Connected..");
+})
+.catch(() => {
+  console.log("Database Not Connected");
 });

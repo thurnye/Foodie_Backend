@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 
 
 // Production
-mongoose.connect(process.env.DATABASE_URL)
-.then(() => {
-  console.log("Database Connected..");
-})
-.catch(() => {
-  console.log("Database Not Connected");
-});
+// mongoose.connect(process.env.DATABASE_URL)
+// .then(() => {
+//   console.log("Database Connected..");
+// })
+// .catch(() => {
+//   console.log("Database Not Connected");
+// });
 
 
 
