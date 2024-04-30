@@ -28,9 +28,9 @@ app.use((req, res, next) => {
 
 app.use(route);
 
-app.get('/*', function(req, res) {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+// app.get('/*', function(req, res) {
+//     res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
 
 // this will change and redirect the backend request for the webcon app to localhost: 9000
 // app.use('/webCon', createProxyMiddleware({target: 'http://localhost:9000', changeOrigin: true}));
