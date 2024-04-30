@@ -16,7 +16,7 @@ app.use(logger('dev'));
 app.use(express.json());
 
 //STATIC FOLDER
-app.use(express.static(path.join(__dirname,'../client/build')));
+app.use(express.static(path.join(__dirname,'../public')));
 
 //SETTING HEADER FOR ACCESS
 app.use((req, res, next) => {
@@ -27,13 +27,6 @@ app.use((req, res, next) => {
 });
 
 app.use(route);
-
-// app.get('/*', function(req, res) {
-//     res.sendFile(path.join(__dirname, 'build', 'index.html'));
-// });
-
-// this will change and redirect the backend request for the webcon app to localhost: 9000
-// app.use('/webCon', createProxyMiddleware({target: 'http://localhost:9000', changeOrigin: true}));
 
 app.listen(PORT, () => {
 console.log(`Server started on port ${PORT}`);

@@ -2,17 +2,14 @@ const mongoose = require('mongoose');
 
 
 // Production
-const db =  mongoose.connect(process.env.DATABASE_URL,{
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.DATABASE_URL)
 .then(() => {
   console.log("Database Connected..");
 })
 .catch(() => {
   console.log("Database Not Connected");
 });
-module.exports = db
+
 
 
 // Local Dev
