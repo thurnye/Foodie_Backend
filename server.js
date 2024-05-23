@@ -32,10 +32,10 @@ app.use(route);
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
 });
-mongoose.connect(process.env.DATABASE_URL)
-.then(() => {
-  console.log("Database Connected..");
-})
-.catch(() => {
-  console.log("Database Not Connected");
-});
+// mongoose.connect(process.env.DATABASE_URL)
+// .then(() => {
+//   console.log("Database Connected..");
+// })
+// .catch(() => {
+//   console.log("Database Not Connected");
+// });

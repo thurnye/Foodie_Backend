@@ -13,8 +13,8 @@ const mongoose = require('mongoose');
 
 
 // Local Dev
-// const db = mongoose.connect('mongodb://localhost/FoodieBlog',{
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//   });
-// module.exports = db
+const db = mongoose.connect('mongodb://localhost/FoodieBlog',{
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+module.exports = db
