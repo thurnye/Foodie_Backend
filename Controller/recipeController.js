@@ -1,5 +1,4 @@
-const Recipe = require('../Model/newRecipe');
-// const Recipe = require('../Model/recipes')
+const Recipe = require('../Model/recipe');
 const User = require('../Model/user');
 const Review = require('../Model/review');
 const jwt = require('jsonwebtoken');

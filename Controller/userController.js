@@ -1,7 +1,7 @@
 //this is the server controller where i do send data to the back end....
 const User = require('../Model/user')
 const Event = require('../Model/events')
-const Recipe = require('../Model/recipes')
+const Recipe = require('../Model/recipe')
 const Review = require('../Model/review')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
