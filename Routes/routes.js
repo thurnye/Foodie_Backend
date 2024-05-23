@@ -1,58 +1,72 @@
-const Controller = require('../Controller/controller');
+const RecipeController = require('../Controller/recipeController');
+const ReviewController = require('../Controller/reviewController');
+const EventController = require('../Controller/eventController');
+const UserController = require('../Controller/userController');
 const router = require('express').Router()
 
 
- 
+// User 
 //post new user
-router.post('/api', Controller.postCreateUser);
+router.post('/user', UserController.postCreateUser);
 
 // POST /api/users/login
-router.post('/api/user/login', Controller.getLogIn);
+router.post('/user/login', UserController.getLogIn);
 
 //post the updated user
-router.post('/edit/:id', Controller.postUpdatedUser);
+router.post('/user/edit/:id', UserController.postUpdatedUser);
 
-//get the loggedIn user recipes
-router.post('/user/:id', Controller.getAUserRecipes);
 
-//post new recipe ---> this will be the post recipe
-router.post('/api/recipe', Controller.postNewRecipe);
 
-//get all recipes
-router.post('/', Controller.getAllRecipes)
-
-//get all recipes
-router.post('/query', Controller.getQueryRecipes)
-
-//post new user review 
-router.post('/api/recipe/review', Controller.postReview);
-
-//getting a recipe by id
-router.get('/api/:id', Controller.getOneRecipe);
-
-//update a recipe by id
-router.post('/api/recipe/update/:id', Controller.getRecipeUpdate);
-
-//delete a recipe
-router.post('/api/removeRecipe/:id', Controller.postDeleteARecipe);
-
+// Events
 //post new event ---> this will be the post recipe
-router.post('/api/event', Controller.postEvent);
+router.post('/event', EventController.postEvent);
 
 //get all events
-router.post('/event/query', Controller.getAllEvents)
+router.post('/event/query', EventController.getAllEvents)
 
 //get the loggedIn user events
-router.post('/user/event/:id', Controller.getUserEvents);
+router.post('/event/user/:id', EventController.getUserEvents);
 
 //getting a event by id
-router.get('/event/:id', Controller.getSingleEvent);
+router.get('/event/:id', EventController.getSingleEvent);
 
 //delete an event
-router.post('/event/:id', Controller.postDeleteEvent);
+router.post('/event/:id', EventController.postDeleteEvent);
 
 
 
+
+
+// RECIPES
+//post recipe ---> create and update
+router.post('/recipe/:userId', RecipeController.postRecipe);
+
+//get the loggedIn user recipes
+router.post('/recipe/user/:id', RecipeController.getAUserRecipes);
+
+//get all recipes
+router.post('/recipes', RecipeController.getAllRecipes);
+
+//get all recipes by query
+router.post('/recipes/query', RecipeController.getQueryRecipes);
+
+//getting a recipe by id
+router.get('/recipe/:id', RecipeController.getOneRecipe);
+
+//update a recipe by id
+// router.post('/recipe/update/:id', RecipeController.getRecipeUpdate);
+
+//delete a recipe
+router.post('/recipe/removeRecipe/:id', RecipeController.postDeleteARecipe);
+
+
+// router.get('/recipe/', RecipeController.updateNewRecipe);
+
+
+
+// Review
+//post new user review 
+router.post('/review/recipe', ReviewController.postReview);
 
 
 
