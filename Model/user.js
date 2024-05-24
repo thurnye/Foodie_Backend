@@ -23,7 +23,7 @@ const userSchema = new Schema({
     type: Schema.Types.String,
   },
   aboutMe: {
-    type: Schema.Types.String,
+    type: Object,
   },
   location: {
     type: Schema.Types.String,
@@ -34,7 +34,7 @@ const userSchema = new Schema({
   resourceList:[{
     type: Object
   }],
-  socialMedia:[{
+  socialMediaPlatform:[{
     type: Object
   }],
   myRecipes: [{

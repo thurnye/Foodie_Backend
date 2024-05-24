@@ -15,6 +15,9 @@ router.post('/user/login', UserController.getLogIn);
 //post the updated user
 router.post('/user/edit/:id', UserController.postUpdatedUser);
 
+//post the updated user
+router.get('/user/:id', UserController.getAUserByID);
+
 
 
 // Events
