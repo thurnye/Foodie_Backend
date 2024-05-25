@@ -69,9 +69,12 @@ const getAUserRecipes = async (req, res, next) => {
     // console.log(count);
     const perPage = req.body.perPage || 9;
     const page = req.body.currentPage || 1;
+    const skip = req.body.skip
+    const isScrollLoad = req.body.isScrollLoad
 
+    
     const recipes = await Recipe.find({ author: author })
-      .skip(perPage * page - perPage)
+      .skip(isScrollLoad ? skip : perPage * page - perPage)
       .limit(perPage)
       .select('_id details.thumbnail basicInfo.recipeName createdAt')
       .exec();
@@ -235,6 +238,9 @@ const postDeleteARecipe = async (req, res, next) => {
     res.status(400).json(err);
   }
 };
+
+
+
 
 module.exports = {
   postRecipe,

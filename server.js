@@ -16,7 +16,7 @@ app.use(logger('dev'));
 app.use(express.json());
 
 //STATIC FOLDER
-app.use(express.static(path.join(__dirname,'../public')));
+app.use(express.static(path.join(__dirname,'Views')));
 
 //SETTING HEADER FOR ACCESS
 app.use((req, res, next) => {
@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 });
 
 app.use(route);
-
+app.set('view engine', 'ejs');
 
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);

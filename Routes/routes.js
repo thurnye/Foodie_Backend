@@ -2,6 +2,8 @@ const RecipeController = require('../Controller/recipeController');
 const ReviewController = require('../Controller/reviewController');
 const EventController = require('../Controller/eventController');
 const UserController = require('../Controller/userController');
+const CookBookController = require('../Controller/cookBookController');
+
 const router = require('express').Router()
 
 
@@ -63,8 +65,7 @@ router.get('/recipe/:id', RecipeController.getOneRecipe);
 router.post('/recipe/removeRecipe/:id', RecipeController.postDeleteARecipe);
 
 
-// router.get('/recipe/', RecipeController.updateNewRecipe);
-
+router.post('/recipe/generateBook/:userId', CookBookController.createRecipeBookPDF);
 
 
 // Review
