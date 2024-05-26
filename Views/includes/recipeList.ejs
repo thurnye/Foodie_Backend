@@ -1,0 +1,140 @@
+<div class="card mb-3">
+  <div class="row g-0">
+    <div class="col-md-5">
+      <div class="card mb-3 mt-3">
+        <img
+          src="<%= recipe.details.thumbnail %>"
+          class="card-img-top"
+          alt="recipe Image"
+        />
+      </div>
+    </div>
+    <div class="col-md-1"></div>
+    <div class="col-md-6">
+      <div class="card-body">
+        <h2 class="card-title text-center mb-2">
+          <%= recipe.basicInfo.recipeName %>
+        </h2>
+      </div>
+      <div class="recipeInfo">
+        <div class="card-text d-flex recipe-info-extras">
+          <p class="text-body-secondary info-items">time:</p>
+          <p class="text-body-secondary">
+            <%= recipe.basicInfo.duration.value %>
+          </p>
+        </div>
+        <div class="card-text d-flex recipe-info-extras">
+          <p class="text-body-secondary info-items">level:</p>
+          <p class="text-body-secondary"><%= recipe.basicInfo.level.value %></p>
+        </div>
+        <div class="card-text d-flex recipe-info-extras">
+          <p class="text-body-secondary info-items">serves:</p>
+          <p class="text-body-secondary">
+            <%= recipe.basicInfo.serving.value %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="aboutRecipe">
+    <% recipe.details.about.forEach(el => { %>
+    <div class="aboutRecipeContainer">
+      <% if (el.type === 'text') { %>
+      <div><%= el.value %></div>
+      <% } else if (el.type === 'image') { %>
+      <div class="container text-center mt-5 mb-5">
+        <div class="row">
+          <% el.value.forEach(details => { %>
+          <div class="col-sm-6 col-md-4 m-auto">
+            <img
+              src="<%= details.thumbnail %>"
+              class="img-fluid rounded-start"
+              alt="thumbnail"
+            />
+          </div>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+    </div>
+    <% }) %>
+    <div class="ingredients mt-5 mb-5">
+      <h4>Ingredients</h4>
+      <div class="container text-center pt-4 pb-4 ingredientContainer">
+        <div class="row">
+          <div class="col">
+            <h6>Main Ingredients</h6>
+            <ul class="list-group list-group-flush">
+              <% recipe.directions.ingredients.forEach(el => { %>
+                <% if (el.type === 'main') { %>
+              <li class="list-group-item text-start"><%= el.name %></li>
+              <% } }) %>
+            </ul>
+          </div>
+          <div class="col">
+            <h6>Dressing</h6>
+            <ul class="list-group list-group-flush">
+              <% recipe.directions.ingredients.forEach(el => { %>
+               <% if (el.type === 'dressing') { %>
+              <li class="list-group-item text-start"><%= el.name %></li>
+              <% } }) %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h4 class="mb-2">Directions</h4>
+      <div>
+        <% recipe.directions.methods.forEach((methods, index) => { const { step } = methods %>
+        <div>
+          <% step.forEach(el => { %> 
+            <% if (el.type === 'title') { %>
+              <div>
+                <h6><%= 'Step ' + (index + 1) + ': ' + el.value %></h6>
+              </div>
+            <% } else { %>
+              <div>
+                <% if (el.type === 'text') { %>
+                  <div><%= el.value %></div>
+                <% } else if (el.type === 'image') { %>
+                  <div class="container text-center mt-5 mb-5">
+                    <div class="row">
+                      <% el.value.forEach(details => { %>
+                      <div class="col-sm-6 col-md-4 m-auto">
+                        <img
+                          src="<%= details.thumbnail %>"
+                          class="img-fluid rounded-start"
+                          alt="thumbnail"
+                        />
+                      </div>
+                      <% }) %>
+                    </div>
+                  </div>
+                <% } %>
+              </div>
+            <% } %> 
+          <% }) %>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+    <div class="mt-5 mb-5">
+      <div>
+        <div class="nutrition">
+          <div class="nutritionHeader">
+            <h6 class="text-center">Nutritional Information</h6>
+          </div>
+          <div class="nutritionContainer">
+            <% recipe.nutritionalFacts.forEach((el, index) => { %>
+            <div class="nutritionList">
+              <p><%= el.amount %> <%= el.unit %></p>
+              <p class="nutrientName"><%= el.name %></p>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

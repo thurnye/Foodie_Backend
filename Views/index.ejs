@@ -1,12 +1,22 @@
-<!-- views/index.ejs -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= data.title %></title>
-</head>
-<body>
-    <h1><%= data.message %></h1>
-</body>
-</html>
+<%- include('./includes/head.ejs') %>
+<link rel="stylesheet" href="/stylesheets/aboutMe.css" />
+<link rel="stylesheet" href="/stylesheets/frontCover.css" />
+<link rel="stylesheet" href="/stylesheets/recipeList.css" />
+<%- include('./includes/closeHead.ejs') %>
+
+<%
+// Define dynamic data
+var frontCover = data.frontCover;
+var recipeList = data.recipe; // Access the recipes from the dynamic data
+var author = data.author; // Access the author information
+%>
+
+<%- include('./includes/frontCover.ejs', { cover: frontCover }) %>
+
+<%- include('./includes/aboutMe.ejs', { author: author }) %>
+
+<% recipeList.forEach(function(recipe) { %>
+    <%- include('./includes/recipeList.ejs', { recipe: recipe }) %>
+<% }) %>
+
+<%- include('./includes/footer.ejs') %>

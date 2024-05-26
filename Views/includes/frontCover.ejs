@@ -1,0 +1,24 @@
+
+
+<div>
+  <div class="frontPage">
+    <div class="card text-bg-dark">
+      <img src="<%=cover.image %>" class="card-img" alt="cover image" />
+      <div class="card-img-overlay">
+        <div class="frontPageDescription">
+          <h2 class="card-title"><%= cover.bookTitle %></h2>
+          <p class="card-text mt-5 frontPageIntro">
+            <%= cover.description %>
+          </p>
+        </div>
+        <div>
+          <p class="frontPageAuthor">
+            By: <%= cover.firstName %> <%= cover.lastName %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

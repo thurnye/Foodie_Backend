@@ -8,7 +8,7 @@ const path = require('path');
 
 async function renderHtml(data) {
     return new Promise((resolve, reject) => {
-      const htmlContent = ejs.renderFile('Views/index.ejs', { data }, (err, renderedHtml) => {
+      const htmlContent = ejs.renderFile('Views/index.ejs', {data}, (err, renderedHtml) => {
         if (err) {
           reject(err);
         } else {
@@ -52,12 +52,28 @@ const createRecipeBookPDF = async (req, res, next) => {
       _id: { $in: recipeIds },
       author: author,
     })
-    .select('details basicInfo nutritionalFacts directions ')
+    .select('details basicInfo nutritionalFacts directions author')
+    .populate({
+      path: 'author',
+      select: 'aboutMe firstName lastName avatar slogan',
+    })
     .exec();
     console.log(recipes.length);
+
+    const findAuthor = await User.findById(author)
+    .select('aboutMe firstName lastName avatar slogan')
+    .exec();
+
     const dynamicData = {
-        title: 'Dynamic Content Example',
-        message: 'Hello, world!'
+        recipe: recipes,
+        author: findAuthor,
+        frontCover: {
+          firstName: findAuthor.firstName,
+          lastName: findAuthor.lastName,
+          bookTitle: 'Testing Recipe Book',
+          image: 'https://images.unsplash.com/photo-1542010589005-d1eacc3918f2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0ODIwNDd8MHwxfHNlYXJjaHw0fHxyZWNpcGV8ZW58MHx8fHwxNzE1NzkzOTgyfDA&ixlib=rb-4.0.3&q=80&w=400',
+          description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,."
+        }
       };
       // Render the dynamic content to an HTML file
   const htmlFilePath = await renderHtml(dynamicData);

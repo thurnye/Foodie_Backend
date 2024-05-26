@@ -16,7 +16,7 @@ app.use(logger('dev'));
 app.use(express.json());
 
 //STATIC FOLDER
-app.use(express.static(path.join(__dirname,'Views')));
+app.use(express.static(path.join(__dirname,'../public')));
 
 //SETTING HEADER FOR ACCESS
 app.use((req, res, next) => {
