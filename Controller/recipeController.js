@@ -76,11 +76,7 @@ const getAUserRecipes = async (req, res, next) => {
     const recipes = await Recipe.find({ author: author })
       .skip(isScrollLoad ? skip : perPage * page - perPage)
       .limit(perPage)
-      .select('_id details basicInfo createdAt author nutritionalFacts directions')
-      .populate({
-        path: 'author',
-        select: '_id firstName lastName avatar slogan aboutMe',
-      })
+      .select('_id details.thumbnail basicInfo.recipeName createdAt')
       .exec();
     const data = {
       recipes,

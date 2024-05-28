@@ -5,6 +5,8 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 const ejs = require('ejs');
 const path = require('path');
+const { parse } = require('node-html-parser');
+
 
 
 
@@ -38,7 +40,16 @@ async function convertToPdf(htmlFilePath) {
     const page = await browser.newPage();
     const fileUrl = `file://${path.resolve(htmlFilePath)}`;
     await page.goto(fileUrl, { waitUntil: 'networkidle0' });
-    const pdfBuffer = await page.pdf();
+    const pdfOptions = {
+      landscape: true,
+      margin: {
+        top: '0.7in',    // Adjust these values as needed
+        right: '0.5in',
+        bottom: '0.4in',
+        left: '0.5in'
+      }
+    };
+    const pdfBuffer = await page.pdf(pdfOptions);
     await browser.close();
     return pdfBuffer;
   } catch (error) {
@@ -91,6 +102,11 @@ const createRecipeBookPDF = async (req, res, next) => {
     };
 
     // Render and convert each page to PDF
+    const coverPagePath = await renderHtml(dynamicData.frontCover.image, 'coverPage', bookName);
+    const coverPageBuffer = await convertToPdf(coverPagePath);
+    await deleteFile(coverPagePath);
+
+    // Render and convert each page to PDF
     const frontPagePath = await renderHtml(dynamicData.frontCover, 'frontPage', bookName);
     const frontPageBuffer = await convertToPdf(frontPagePath);
     await deleteFile(frontPagePath);
@@ -108,6 +124,7 @@ const createRecipeBookPDF = async (req, res, next) => {
 
     const merger = new PDFMerger();
 
+    await merger.add(coverPageBuffer);
     await merger.add(frontPageBuffer);
     await merger.add(authorPageBuffer);
 
@@ -136,42 +153,3 @@ module.exports = {
   createRecipeBookPDF,
 };
 
-const getDataForPDF = async (req, res, next) => {
-  try {
-    console.log(req.body);
-    const author = req.params.userId;
-    const recipeIds = req.body.recipeIds;
-    const coverPage = req.body.coverPage;
-    const bookName = req.body.name;
-    const description = req.body.description;
-    const recipes = await Recipe.find({
-      _id: { $in: recipeIds },
-      author: author,
-    })
-    .select('details basicInfo nutritionalFacts directions author')
-    .populate({
-      path: 'author',
-      select: 'aboutMe firstName lastName avatar slogan',
-    })
-    .exec();
-
-    const findAuthor = await User.findById(author)
-    .select('aboutMe firstName lastName avatar slogan')
-    .exec();
-
-    const dynamicData = {
-        recipe: recipes,
-        author: findAuthor,
-        frontCover: {
-          firstName: findAuthor.firstName,
-          lastName: findAuthor.lastName,
-          bookTitle: bookName,
-          image: coverPage,
-          description: description
-        }
-      };
-      res.status(200).json(dynamicData);
-  } catch (error) {
-    console.log(error);
-  }
-};
