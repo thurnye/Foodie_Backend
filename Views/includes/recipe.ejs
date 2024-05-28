@@ -185,7 +185,7 @@
           <% if (el.type === 'text') { %>
           <div><%- el.value %></div>
           <% } else if (el.type === 'image') { %>
-          <div class="container text-center mt-5 mb-5">
+          <div class="container text-center mt-5 mb-5" style="margin-top: 20px">
             <div class="row" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
               <% el.value.forEach(img => { %>
               <div
@@ -237,7 +237,7 @@
           style="
             display: flex;
             flex-wrap: wrap;
-            background: #f8f6e6 !important;
+            background-color: #f8f6e6 !important;
             width: 90%;
             margin: auto;
           "
