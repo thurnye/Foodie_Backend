@@ -5,29 +5,8 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 const ejs = require('ejs');
 const path = require('path');
-const { PDFDocument } = require('pdf-lib');
 
-async function combinePdfsWithPuppeteer(pdfBuffers) {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.setContent('<div id="pdf-container"></div>');
 
-  for (const buffer of pdfBuffers) {
-    const dataUri = `data:application/pdf;base64,${buffer.toString('base64')}`;
-    await page.evaluate((dataUri) => {
-      const pdfContainer = document.getElementById('pdf-container');
-      const iframe = document.createElement('iframe');
-      iframe.src = dataUri;
-      pdfContainer.appendChild(iframe);
-    }, dataUri);
-  }
-
-  const combinedPdfBuffer = await page.pdf({ format: 'A4' });
-
-  await browser.close();
-
-  return combinedPdfBuffer;
-}
 
 const toCamelCase = (str) => {
   return str
@@ -65,17 +44,6 @@ async function convertToPdf(htmlFilePath) {
   } catch (error) {
     throw new Error(`Conversion to PDF failed: ${error.message}`);
   }
-}
-
-async function combinePdfBuffers(pdfBuffers) {
-  const mergedPdf = await PDFDocument.create();
-  for (const pdfBuffer of pdfBuffers) {
-    const pdf = await PDFDocument.load(pdfBuffer);
-    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-    copiedPages.forEach((page) => mergedPdf.addPage(page));
-    // console.log("copiedPages", copiedPages)
-  }
-  return await mergedPdf.save();
 }
 
 async function deleteFile(filePath) {
