@@ -7,16 +7,28 @@
 <%
 // Define dynamic data
 var frontCover = data.frontCover;
-var recipeList = data.recipe; // Access the recipes from the dynamic data
+var recipe = data.recipe; // Access the recipes from the dynamic data
 var author = data.author; // Access the author information
+var pageType = type
 %>
 
-<%- include('./includes/frontCover.ejs', { cover: frontCover }) %>
 
-<%- include('./includes/aboutMe.ejs', { author: author }) %>
 
-<% recipeList.forEach(function(recipe) { %>
-    <%- include('./includes/recipeList.ejs', { recipe: recipe }) %>
-<% }) %>
+
+            
+<% if (pageType === 'frontPage') { %>
+    <%- include('./includes/frontCover.ejs', { cover: data }) %>
+
+<% } else if (pageType === 'aboutPage') { %>
+    <%- include('./includes/aboutMe.ejs', { author: data }) %>
+
+<% } else { %>
+    <%- include('./includes/recipeList.ejs', { recipe: data }) %>
+
+<% } %>
+ 
+
+
+
 
 <%- include('./includes/footer.ejs') %>

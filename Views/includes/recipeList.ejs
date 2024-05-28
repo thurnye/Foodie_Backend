@@ -16,19 +16,22 @@
           <%= recipe.basicInfo.recipeName %>
         </h2>
       </div>
-      <div class="recipeInfo">
-        <div class="card-text d-flex recipe-info-extras">
-          <p class="text-body-secondary info-items">time:</p>
+      <div class="recipeInfo" style=" display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;">
+        <div class="card-text d-flex recipe-info-extras" style="margin-bottom: -15px;">
+          <p class="text-body-secondary info-items" style="width: 70px;">time:</p>
           <p class="text-body-secondary">
             <%= recipe.basicInfo.duration.value %>
           </p>
         </div>
-        <div class="card-text d-flex recipe-info-extras">
-          <p class="text-body-secondary info-items">level:</p>
+        <div class="card-text d-flex recipe-info-extras" style="margin-bottom: -15px;">
+          <p class="text-body-secondary info-items" style="width: 70px;">level:</p>
           <p class="text-body-secondary"><%= recipe.basicInfo.level.value %></p>
         </div>
-        <div class="card-text d-flex recipe-info-extras">
-          <p class="text-body-secondary info-items">serves:</p>
+        <div class="card-text d-flex recipe-info-extras" style="margin-bottom: -15px;">
+          <p class="text-body-secondary info-items" style="width: 70px;">serves:</p>
           <p class="text-body-secondary">
             <%= recipe.basicInfo.serving.value %>
           </p>
@@ -36,9 +39,10 @@
       </div>
     </div>
   </div>
-  <div class="aboutRecipe">
+  <div class="aboutRecipe" style="margin-top: 30px;">
     <% recipe.details.about.forEach(el => { %>
-    <div class="aboutRecipeContainer">
+    <div class="aboutRecipeContainer" style="width: 100%;
+    margin: 16px initial;">
       <% if (el.type === 'text') { %>
       <div><%= el.value %></div>
       <% } else if (el.type === 'image') { %>
@@ -60,7 +64,7 @@
     <% }) %>
     <div class="ingredients mt-5 mb-5">
       <h4>Ingredients</h4>
-      <div class="container text-center pt-4 pb-4 ingredientContainer">
+      <div class="container text-center pt-4 pb-4 ingredientContainer" style="background: #e7e7e7;">
         <div class="row">
           <div class="col">
             <h6>Main Ingredients</h6>
@@ -121,15 +125,33 @@
     </div>
     <div class="mt-5 mb-5">
       <div>
-        <div class="nutrition">
-          <div class="nutritionHeader">
+        <div class="nutrition" style="display: flex;
+        justify-content: center;
+        flex-direction: column;">
+          <div class="nutritionHeader" style=" display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 80%;
+          margin: auto;
+          padding: 32px;
+          background: #fee86d;">
             <h6 class="text-center">Nutritional Information</h6>
           </div>
-          <div class="nutritionContainer">
+          <div class="nutritionContainer" style="display: flex;
+          flex-wrap: wrap;
+          background: #f8f6e6;
+          width: 90%;
+          margin: auto;">
             <% recipe.nutritionalFacts.forEach((el, index) => { %>
-            <div class="nutritionList">
+            <div class="nutritionList" style="flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-right: 15px;">
               <p><%= el.amount %> <%= el.unit %></p>
-              <p class="nutrientName"><%= el.name %></p>
+              <p class="nutrientName" style="margin-top: -15px;"><%= el.name %></p>
             </div>
             <% }) %>
           </div>

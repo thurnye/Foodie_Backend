@@ -1,24 +1,58 @@
-
-
-<div>
-  <div class="frontPage">
-    <div class="card text-bg-dark">
-      <img src="<%=cover.image %>" class="card-img" alt="cover image" />
-      <div class="card-img-overlay">
-        <div class="frontPageDescription">
-          <h2 class="card-title"><%= cover.bookTitle %></h2>
-          <p class="card-text mt-5 frontPageIntro">
-            <%= cover.description %>
-          </p>
-        </div>
-        <div>
-          <p class="frontPageAuthor">
-            By: <%= cover.firstName %> <%= cover.lastName %>
-          </p>
-        </div>
+<div class="frontPage" style="width: 100%; margin: auto">
+  <div
+    class="text-bg-dark"
+    style="position: relative; border: 2px dotted red; height: 70vh"
+  >
+    <img
+      src="<%=cover.image %>"
+      class="card-img"
+      alt="cover image"
+      style="
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 70vh;
+      "
+    />
+    <div
+      class="card-img-overlay"
+      style="height: 100%; position: absolute; top: 0; width: 100%"
+    >
+      <div
+        class="frontPageDescription"
+        style="
+          border: 2px solid white;
+          height: 95%;
+          width: 98%;
+          margin: 20px auto 20px auto;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          color: white;
+        "
+      >
+        <h2 class="card-title" style="color: white"><%= cover.bookTitle %></h2>
+        <p
+          class="card-text mt-5 frontPageIntro"
+          style="
+            width: 500px;
+            text-align: center;
+            margin-top: 24px;
+            color: #fff;
+          "
+        >
+          <%= cover.description %>
+        </p>
+      </div>
+      <div>
+        <p
+          class="frontPageAuthor"
+          style="text-align: end; font-weight: bolder; margin-top: -50px"
+        >
+          By: <%= cover.firstName %> <%= cover.lastName %>
+        </p>
       </div>
     </div>
   </div>
 </div>
-
-

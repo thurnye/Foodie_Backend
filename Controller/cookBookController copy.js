@@ -7,40 +7,6 @@ const ejs = require('ejs');
 const path = require('path');
 const { PDFDocument } = require('pdf-lib');
 
-async function combinePdfsWithPuppeteer(pdfBuffers) {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.setContent('<div id="pdf-container"></div>');
-
-  for (const buffer of pdfBuffers) {
-    const dataUri = `data:application/pdf;base64,${buffer.toString('base64')}`;
-    await page.evaluate((dataUri) => {
-      const pdfContainer = document.getElementById('pdf-container');
-      const iframe = document.createElement('iframe');
-      iframe.src = dataUri;
-      pdfContainer.appendChild(iframe);
-    }, dataUri);
-  }
-
-  const combinedPdfBuffer = await page.pdf({ format: 'A4' });
-
-  await browser.close();
-
-  return combinedPdfBuffer;
-}
-
-const toCamelCase = (str) => {
-  return str
-      .split(' ')
-      .map((word, index) => {
-          if (index === 0) {
-              return word.toLowerCase();
-          }
-          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-      })
-      .join('');
-}
-
 async function renderHtml(data, pageType, bookTitle) {
   const htmlFilePath = path.join(__dirname, '../Views', `${pageType}.html`);
   const ejsFilePath = path.join(__dirname, '../Views/index.ejs');
@@ -73,22 +39,12 @@ async function combinePdfBuffers(pdfBuffers) {
     const pdf = await PDFDocument.load(pdfBuffer);
     const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
     copiedPages.forEach((page) => mergedPdf.addPage(page));
-    // console.log("copiedPages", copiedPages)
   }
   return await mergedPdf.save();
 }
 
-async function deleteFile(filePath) {
-  try {
-    await fs.unlink(filePath);
-  } catch (error) {
-    console.error(`Error deleting file ${filePath}: ${error.message}`);
-  }
-}
-
 const createRecipeBookPDF = async (req, res, next) => {
   try {
-    const PDFMerger = (await import('pdf-merger-js')).default;
     const { userId: author } = req.params;
     const { recipeIds, coverPage, name: bookName, description } = req.body;
 
@@ -107,9 +63,6 @@ const createRecipeBookPDF = async (req, res, next) => {
     .select('aboutMe firstName lastName avatar slogan')
     .exec();
 
-    const allRecipeNames = recipes.map((el) => el.basicInfo.recipeName)
-    const recipeNames = allRecipeNames.map(toCamelCase)
-
     const dynamicData = {
       recipe: recipes,
       author: findAuthor,
@@ -125,36 +78,30 @@ const createRecipeBookPDF = async (req, res, next) => {
     // Render and convert each page to PDF
     const frontPagePath = await renderHtml(dynamicData.frontCover, 'frontPage', bookName);
     const frontPageBuffer = await convertToPdf(frontPagePath);
-    await deleteFile(frontPagePath);
 
     const authorPagePath = await renderHtml(dynamicData.author, 'aboutPage', bookName);
     const authorPageBuffer = await convertToPdf(authorPagePath);
-    await deleteFile(authorPagePath);
 
-    const recipePageBuffers = await Promise.all(recipes.map(async (recipe, i) => {
-      const recipePagePath = await renderHtml(recipe, recipeNames[i], bookName);
-      const pdfBuffer = await convertToPdf(recipePagePath);
-      await deleteFile(recipePagePath);
-      return pdfBuffer;
+    const recipePageBuffers = await Promise.all(recipes.map(async (recipe) => {
+      const recipePagePath = await renderHtml(recipe, 'recipePage', bookName);
+      return await convertToPdf(recipePagePath);
     }));
 
-    const merger = new PDFMerger();
+    // Combine all PDF buffers into a single PDF
+    const combinedPdfBuffer = await combinePdfBuffers([frontPageBuffer, authorPageBuffer, ...recipePageBuffers]);
 
-    await merger.add(frontPageBuffer);
-    await merger.add(authorPageBuffer);
+    // Send the combined PDF as response
+    res.contentType("application/pdf");
+    res.send(combinedPdfBuffer);
 
-    for (const buffer of recipePageBuffers) {
-        await merger.add(buffer);
-    }
-
-    const mergedPdfBuffer = await merger.saveAsBuffer();
-
-    console.log("mergedPdfBuffer", mergedPdfBuffer)
-
-    // Send the PDF as response
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=recipe-book.pdf');
-    res.send(mergedPdfBuffer);
+    // Clean up HTML files
+    await Promise.all([frontPagePath, authorPagePath, ...recipePageBuffers.map((_, index) => path.join(__dirname, '../Views', `recipePage${index}.html`))].map(async (filePath) => {
+      try {
+        await fs.unlink(filePath);
+      } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
+      }
+    }));
 
   } catch (error) {
     console.error(error);
@@ -167,6 +114,15 @@ const createRecipeBookPDF = async (req, res, next) => {
 module.exports = {
   createRecipeBookPDF,
 };
+
+
+
+
+// module.exports = {
+//   createRecipeBookPDF,
+//   // getDataForPDF
+//   //   updateNewRecipe
+// };
 
 const getDataForPDF = async (req, res, next) => {
   try {

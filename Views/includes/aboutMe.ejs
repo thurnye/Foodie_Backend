@@ -1,4 +1,4 @@
-<div class="card mb-3 aboutMe">
+<div class="card mb-3 aboutMe" style="margin-top: 30px; border: 2px dotted red">
   <h4 class="card-title">About me</h4>
   <div class="row g-0">
     <div class="col-md-6">
@@ -11,7 +11,10 @@
       </div>
     </div>
     <div class="col-md-6">
-      <div class="card-body authorTitle d-flex">
+      <div class="card-body authorTitle d-flex" style="display: flex; flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;">
         <h5 class="card-title">
           <%= author.firstName%> &nbsp;
           <%= author.lastName%>
@@ -26,7 +29,8 @@
   </div>
   <div class="mb-5">
     <% author.aboutMe.map((el) => { %>
-    <div class="aboutMeContainer">
+    <div class="aboutMeContainer" style="width: 100%;
+    margin: 16px initial">
       <% if (el.type === 'text') { %>
         <div><%= el.value %></div>
       <% } else if (el.type === 'image') { %>

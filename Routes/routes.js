@@ -64,8 +64,11 @@ router.get('/recipe/:id', RecipeController.getOneRecipe);
 //delete a recipe
 router.post('/recipe/removeRecipe/:id', RecipeController.postDeleteARecipe);
 
-
+//generate PDF
 router.post('/recipe/generateBook/:userId', CookBookController.createRecipeBookPDF);
+
+//get Data for PDF generation - FrontEnd
+// router.post('/recipe/generateCookBook/:userId', CookBookController.getDataForPDF);
 
 
 // Review
