@@ -3,6 +3,7 @@ const ReviewController = require('../Controller/reviewController');
 const EventController = require('../Controller/eventController');
 const UserController = require('../Controller/userController');
 const CookBookController = require('../Controller/cookBookController');
+const AppController = require('../Controller/appController');
 
 const router = require('express').Router()
 
@@ -77,6 +78,9 @@ router.post('/review/recipe', ReviewController.postReview);
 
 
 
+//APP
+// get autocomplete by sections - all , category', 'recipe', 'event', 'author'
+router.post('/autoComplete', AppController.getAutoComplete)
 
 
 

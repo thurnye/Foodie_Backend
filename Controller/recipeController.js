@@ -2,6 +2,7 @@ const Recipe = require('../Model/recipe');
 const User = require('../Model/user');
 const Review = require('../Model/review');
 const jwt = require('jsonwebtoken');
+const AutoComplete = require('../Model/autoComplete');
 
 //Create New Recipe
 const postRecipe = async (req, res, next) => {
@@ -40,6 +41,11 @@ const postRecipe = async (req, res, next) => {
       const recipeId = { recipe: savedRecipe._id };
 
       foundUser.myRecipes.push(recipeId);
+      const newData = new AutoComplete({
+        title: basicInfo.recipeTitle,
+        section: 'recipe'
+      })
+      await newData.save()
 
       await foundUser.save();
     }

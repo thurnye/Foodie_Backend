@@ -1,10 +1,7 @@
-//this is the server controller where i do send data to the back end....
 const User = require('../Model/user');
-const Event = require('../Model/events');
-const Recipe = require('../Model/recipe');
-const Review = require('../Model/review');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const AutoComplete = require('../Model/autoComplete');
 
 const SALT_ROUNDS = 6; // tell bcrypt how many times to randomize the generation of salt. usually 6 is enough.
 
@@ -20,6 +17,11 @@ const postCreateUser = async (req, res, next) => {
       password: hashedPassword,
     });
     const user = await newUser.save();
+    const newData = new AutoComplete({
+      title: `${user.firstName} ${user.lastName}`,
+      section: 'author'
+    })
+    await newData.save()
     const token = jwt.sign({ user }, process.env.SECRET, { expiresIn: '24h' });
     // send a response to the front end
     res.status(200).json(token);
