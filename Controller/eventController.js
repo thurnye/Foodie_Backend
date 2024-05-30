@@ -2,6 +2,7 @@ const User = require('../Model/user');
 const Event = require('../Model/events');
 const jwt = require('jsonwebtoken');
 const HelperFunc = require('../Utils/common');
+const AutoComplete = require('../Model/autoComplete');
 
 const postEvent = async (req, res, next) => {
   try {
@@ -41,7 +42,11 @@ const postEvent = async (req, res, next) => {
       const foundUser = await User.findById(userId);
       foundUser.events.myEvents.push(eventId);
       await foundUser.save();
-      console.log('Saved');
+      const newData = new AutoComplete({
+        title: basicInfo.eventTitle,
+        section: 'event'
+      })
+      await newData.save()
 
       const user = await User.findById(userId)
         .populate({

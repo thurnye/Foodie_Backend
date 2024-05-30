@@ -1,0 +1,268 @@
+<div class="card mb-3">
+  <div
+    class="row g-0"
+    style="
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 10px;
+      margin-bottom: 30px;
+    "
+  >
+    <div class="col-md-5" style="text-align: center">
+      <div class="card mb-3 mt-3" style="margin: 24px auto">
+        <img
+          src="<%= recipe.details.thumbnail %>"
+          class="card-img-top"
+          alt="recipe Image"
+          style="width: 80%;"
+        />
+      </div>
+    </div>
+    <div class="col-md-6" style="padding: 5px; text-align: center">
+      <div
+        class="card-body"
+        style="
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+        "
+      >
+        <h2
+          class="card-title text-center mb-2"
+          style="font-size: 30px; text-wrap: wrap; text-align: center"
+        >
+          <%= recipe.basicInfo.recipeName %>
+        </h2>
+      </div>
+      <div
+        class="recipeInfo"
+        style="
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: flex-start;
+        "
+      >
+        <div
+          class="card-text d-flex recipe-info-extras"
+          style="
+            margin-bottom: -15px;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: flex-start;
+          "
+        >
+          <p class="text-body-secondary info-items" style="width: 70px">
+            Duration:
+          </p>
+          <p class="text-body-secondary">
+            <%= recipe.basicInfo.duration.value %>
+          </p>
+        </div>
+        <div
+          class="card-text d-flex recipe-info-extras"
+          style="
+            margin-bottom: -15px;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: flex-start;
+          "
+        >
+          <p class="text-body-secondary info-items" style="width: 70px">
+            Level:
+          </p>
+          <p class="text-body-secondary"><%= recipe.basicInfo.level.value %></p>
+        </div>
+        <div
+          class="card-text d-flex recipe-info-extras"
+          style="
+            margin-bottom: -15px;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: flex-start;
+          "
+        >
+          <p class="text-body-secondary info-items" style="width: 70px">
+            Serves:
+          </p>
+          <p class="text-body-secondary">
+            <%= recipe.basicInfo.serving.value %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="aboutRecipe" style="margin-top: 30px">
+    <% recipe.details.about.forEach(el => { %>
+    <div class="aboutRecipeContainer" style="width: 100%; margin: 16px auto">
+      <% if (el.type === 'text') { %>
+      <div><%- el.value %></div>
+      <% } else if (el.type === 'image') { %>
+      <div class="container text-center ">
+        <div class="row" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
+          <% el.value.forEach(img => { %>
+          <div
+            class="col-sm-6 col-md-4 m-auto"
+            style="height: 170px; width: 170px; margin: 10px"
+          >
+            <img
+              src="<%= img %>"
+              class="img-fluid rounded-start"
+              alt="thumbnail"
+              width="100%"
+            />
+          </div>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+    </div>
+    <% }) %>
+  </div>
+
+  <!-- Ingredients -->
+  <div class="ingredients mt-5 mb-5" >
+    <h4 style="font-size: 20px;">Ingredients</h4>
+    <div
+      class="container text-center pt-4 pb-4 ingredientContainer"
+      style="background: #e7e7e7;"
+    >
+      <div
+        class="row"
+        style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"
+      >
+        <div class="col">
+          <h6 style="text-align: center; font-size: 18px; " >Main Ingredients</h6>
+          <ul class="list-group list-group-flush">
+            <% recipe.directions.ingredients.forEach(el => { %>
+            <% if (el.type === 'main') { %>
+            <li
+              class="list-group-item text-start"
+              style="padding: 5px 0; border-bottom: 1px solid #ccc"
+            >
+              <%= el.name %>
+            </li>
+            <% } %>
+            <% }) %>
+          </ul>
+        </div>
+        <div class="col">
+          <h6 style="text-align: center; font-size: 18px;">Dressing</h6>
+          <ul class="list-group list-group-flush">
+            <% recipe.directions.ingredients.forEach(el => { %>
+            <% if (el.type === 'dressing') { %>
+            <li
+              class="list-group-item text-start"
+              style="padding: 5px 0; border-bottom: 1px solid #ccc"
+            >
+              <%= el.name %>
+            </li>
+            <% } %>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Directions -->
+  <div>
+    <h4 class="mb-2" style="font-size: 20px;">Directions</h4>
+    <div>
+      <% recipe.directions.methods.forEach((methods, index) => { const { step } = methods %>
+      <div>
+        <% step.forEach(el => { %>
+        <% if (el.type === 'title') { %>
+        <div>
+          <h6 style="font-size: 18px;"><%= 'Step ' + (index + 1) + ': ' + el.value %></h6>
+        </div>
+        <% } else { %>
+        <div>
+          <% if (el.type === 'text') { %>
+          <div><%- el.value %></div>
+          <% } else if (el.type === 'image') { %>
+          <div class="container text-center mt-5 mb-5" style="margin-top: 20px">
+            <div class="row" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
+              <% el.value.forEach(img => { %>
+              <div
+                class="col-sm-6 col-md-4 m-auto"
+                style="height: 170px; width: 170px; margin: 10px"
+              >
+                <img
+                  src="<%= img %>"
+                  class="img-fluid rounded-start"
+                  alt="thumbnail"
+                  width="100%"
+                />
+              </div>
+              <% }) %>
+            </div>
+          </div>
+          <% } %>
+        </div>
+        <% } %>
+        <% }) %>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- Nutrition Facts -->
+  <div class="mt-5 mb-5" style="margin-top: 30px">
+    <div>
+      <div
+        class="nutrition"
+        style="display: flex; justify-content: center; flex-direction: column"
+      >
+        <div
+          class="nutritionHeader"
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 80%;
+            margin: auto;
+            padding: 32px;
+            background: #fee86d !important;
+          "
+        >
+          <h6 class="text-center" style="font-size: 20px;">Nutritional Information</h6>
+        </div>
+        <div
+          class="nutritionContainer"
+          style="
+            display: flex;
+            flex-wrap: wrap;
+            background-color: #f8f6e6 !important;
+            width: 90%;
+            margin: auto;
+          "
+        >
+          <% recipe.nutritionalFacts.forEach((el, index) => { %>
+          <div
+            class="nutritionList"
+            style="
+              flex-grow: 1;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              flex-wrap: wrap;
+              margin-right: 15px;
+            "
+          >
+            <p><%= el.amount %> <%= el.unit %></p>
+            <p class="nutrientName" style="margin-top: -15px">
+              <%= el.name %>
+            </p>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

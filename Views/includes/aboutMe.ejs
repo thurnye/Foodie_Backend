@@ -1,0 +1,72 @@
+<div class="card mb-3 aboutMe">
+  <h4 class="card-title" style="font-size: 30px">About me</h4>
+  <div
+    class="row g-0"
+    style="
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 30px;
+    "
+  >
+    <div class="col-md-6" style="text-align: center">
+      <div class="card mb-3 mt-3" style="margin: 24px initial">
+        <img src="<%=author.avatar%>" class="card-img-top" alt="author image" />
+      </div>
+    </div>
+    <div class="col-md-6" style="padding: 5px; text-align: center">
+      <div
+        class="card-body authorTitle d-flex"
+        style="
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          height: 100%;
+        "
+      >
+        <h5
+          class="card-title"
+          style="font-size: 30; text-wrap: wrap; text-align: center"
+        >
+          <%= author.firstName%> &nbsp; <%= author.lastName%>
+        </h5>
+        <p
+          class="card-text"
+          style="
+            font-size: 14;
+            text-wrap: wrap;
+            text-align: center;
+            max-width: 450px;
+            margin-top: -20px;
+          "
+        >
+          <small class="text-body-secondary"> <%=author.slogan%> </small>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-5">
+    <% author.aboutMe.map((el) => { %>
+    <div class="aboutMeContainer" style="width: 100%; margin: 16px initial">
+      <% if (el.type === 'text') { %>
+        <div>
+          <%- el.value %> 
+        </div>
+      <% } else if (el.type === 'image') { %>
+        <div class="container text-center mt-5 mb-5">
+          <div class="row">
+            <% el.value.map((img) => { %>
+              <div class="col-sm-6 col-md-4 m-auto">
+                <img src="<%= img %>" class="img-fluid rounded-start" alt="image" />
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+      
+    </div>
+    <% }) %>
+  </div>
+</div>

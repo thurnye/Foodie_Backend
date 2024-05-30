@@ -1,0 +1,14 @@
+.aboutMe {
+  border: 2px dotted red;
+}
+
+.authorTitle {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.aboutMeContainer{
+    width: 100%;
+    margin: 16px initial
+}
