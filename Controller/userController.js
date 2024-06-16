@@ -33,16 +33,34 @@ const postCreateUser = async (req, res, next) => {
 // Login a User
 const getLogIn = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email }).exec();
-    // console.log(user)
-    // check password. if it's bad throw an error.
-    if (!(await bcrypt.compare(req.body.password, user.password)))
-      throw new Error();
+    const email = req.body.email;
+    const password = req.body.password;
 
-    // if we got to this line, password is ok. give user a new token.
-    const token = jwt.sign({ user }, process.env.SECRET, { expiresIn: '24h' });
-    res.json(token);
-  } catch {
+    // Find the user and select necessary fields
+    const user = await User.findOne({ email }).select('firstName lastName email password').lean();
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Check the password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error('Invalid password');
+    }
+
+    const loggedUser= {
+      _id : user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email
+    }
+
+    const token = jwt.sign({ user:loggedUser }, process.env.SECRET, { expiresIn: '24h' });
+  // send a response to the front end
+  res.status(200).json(token);
+  } catch (error) {
+    console.log(error);
     res.status(400).json('Bad Credentials');
   }
 };

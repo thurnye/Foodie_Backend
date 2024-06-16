@@ -43,7 +43,7 @@ const postEvent = async (req, res, next) => {
       foundUser.events.myEvents.push(eventId);
       await foundUser.save();
       const newData = new AutoComplete({
-        title: basicInfo.eventTitle,
+        title: savedEvent.basicInfo.eventTitle,
         section: 'event'
       })
       await newData.save()
@@ -145,6 +145,7 @@ const getUserEvents = async (req, res, next) => {
     const events = await Event.find({ createdBy: userId })
       .skip(perPage * page - perPage)
       .limit(perPage)
+      .select('basicInfo.eventTitle basicInfo.organizer details.summary tickets.sections schedule createdAt createdBy')
       .populate({
         path: 'createdBy',
         select: '_id avatar lastName firstName followers',

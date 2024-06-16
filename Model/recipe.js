@@ -60,22 +60,20 @@ const recipeSchema = new Schema(
     ],
     directions: {
       methods: [
-        // {
-        //   step: [
-        //     {
-        //       type: {
-        //         type: String,
-        //         required: true,
-        //         enum: ["title", 'text', 'image', 'video'],
-        //       },
-        //       value: { type: Object, required: true },
-        //       isUnsplash: { type: Boolean },
-        //       isMultiple: { type: Boolean },
-        //     },
-        //   ],
-        // },
-        {type: Object,
-                required: true,}
+        {
+          step: [
+            {
+              type: {
+                type: String,
+                required: true,
+                enum: ["title", 'text', 'image', 'video'],
+              },
+              value: { type: Object, required: true },
+              isUnsplash: { type: Boolean },
+              isMultiple: { type: Boolean },
+            },
+          ],
+        },
       ],
       ingredients: [
         {

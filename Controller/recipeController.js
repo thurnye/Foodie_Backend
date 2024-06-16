@@ -16,6 +16,8 @@ const postRecipe = async (req, res, next) => {
       })
       .exec();
 
+    let data = {};
+
     if (_id) {
       //update
       console.log('Updating....');
@@ -27,6 +29,7 @@ const postRecipe = async (req, res, next) => {
           (recipe.nutritionalFacts = nutritionalFacts),
           recipe.save();
       }
+      data = recipe;
     }
     if (!_id) {
       //create
@@ -42,11 +45,10 @@ const postRecipe = async (req, res, next) => {
 
       foundUser.myRecipes.push(recipeId);
       const newData = new AutoComplete({
-        title: basicInfo.recipeTitle,
-        section: 'recipe'
-      })
-      await newData.save()
-
+        title: basicInfo.recipeName,
+        section: 'recipe',
+      });
+      data = await newData.save();
       await foundUser.save();
     }
 
@@ -55,10 +57,8 @@ const postRecipe = async (req, res, next) => {
     //     path: 'myRecipes.recipe',
     //   })
     //   .exec();
-    const token = jwt.sign({ user: foundUser }, process.env.SECRET, {
-      expiresIn: '24h',
-    });
-    res.status(200).json(token);
+
+    res.status(200).json(data._id);
   } catch (err) {
     console.log(err);
     res.status(400).json(err);
@@ -75,10 +75,9 @@ const getAUserRecipes = async (req, res, next) => {
     // console.log(count);
     const perPage = req.body.perPage || 9;
     const page = req.body.currentPage || 1;
-    const skip = req.body.skip
-    const isScrollLoad = req.body.isScrollLoad
+    const skip = req.body.skip;
+    const isScrollLoad = req.body.isScrollLoad;
 
-    
     const recipes = await Recipe.find({ author: author })
       .skip(isScrollLoad ? skip : perPage * page - perPage)
       .limit(perPage)
@@ -99,7 +98,7 @@ const getAUserRecipes = async (req, res, next) => {
 const getAllRecipes = async (req, res, next) => {
   try {
     console.log(req.body);
-    const count = await Recipe.find().countDocuments();
+    // const count = await Recipe.find().countDocuments();
     const perPage = 9;
     const page = req.body.currentPage;
     const recipes = await Recipe.find({})
@@ -112,7 +111,7 @@ const getAllRecipes = async (req, res, next) => {
       .exec();
     const data = {
       recipes,
-      count: Math.ceil(count / perPage),
+      // count: Math.ceil(count / perPage),
     };
     res.status(200).json(data);
   } catch (err) {
@@ -124,18 +123,13 @@ const getAllRecipes = async (req, res, next) => {
 const getQueryRecipes = async (req, res, next) => {
   try {
     const filter = req.body.filter;
-    const category = filter?.category;
-    const page = req.body.currentPage;
+    const categories = filter?.category;
     const keyword = filter?.keywordSearch;
-    const options = filter?.options;
     const tags = filter?.tags;
-    const perPage = 9;
+    const perPage = 20;
     const query = {};
-    let categories = [category && category];
-    
-    if (options) {
-      categories = [category && category, ...(options ? options : {})];
-    }
+    const skip = req.body.skip;
+    console.log(req.body);
 
     // Save Category, Tags as strings[] not as an array of objects
     const filteredCategories = categories.filter(
@@ -151,24 +145,24 @@ const getQueryRecipes = async (req, res, next) => {
     if (filteredCategories.length > 0) {
       query['basicInfo.categories.value'] = { $in: filteredCategories };
     }
-
     const count = await Recipe.find(query).countDocuments();
     const recipes = await Recipe.find(query)
-      .skip(perPage * page - perPage)
+      .skip(skip)
       .limit(perPage)
-      .populate('author')
+      .select(
+        '_id details.thumbnail basicInfo.recipeName basicInfo.level basicInfo.duration'
+      )
       .exec();
-      
+
     const data = {
       recipes,
-      count: Math.ceil(count / perPage),
+      count,
     };
     res.status(200).json(data);
   } catch (err) {
     res.status(400).json(err);
   }
 };
-
 
 //RETRIEVE A Recipe BY ID
 const getOneRecipe = async (req, res, next) => {
@@ -244,9 +238,6 @@ const postDeleteARecipe = async (req, res, next) => {
     res.status(400).json(err);
   }
 };
-
-
-
 
 module.exports = {
   postRecipe,
