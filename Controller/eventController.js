@@ -172,7 +172,6 @@ const getSingleEvent = async (req, res, next) => {
         select: '_id avatar lastName firstName followers',
       })
       .exec();
-
     res.status(200).json(event);
   } catch (err) {
     res.status(400).json(err);

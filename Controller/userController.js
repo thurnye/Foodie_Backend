@@ -5,28 +5,71 @@ const AutoComplete = require('../Model/autoComplete');
 
 const SALT_ROUNDS = 6; // tell bcrypt how many times to randomize the generation of salt. usually 6 is enough.
 
-//Creating A User
+
+//Create or Update A User
 const postCreateUser = async (req, res, next) => {
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, SALT_ROUNDS);
+    const id = req.body.userId;
+    let savedUser = null;
+    if (!req.body.email || !req.body.password) {
+      res.status(400).json('Missing Field Needed!');
+      return;
+    }
+    if (!id) {
+      // Create New User
+      const hashedPassword = await bcrypt.hash(req.body.password, SALT_ROUNDS);
 
-    const newUser = new User({
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      password: hashedPassword,
-    });
-    const user = await newUser.save();
-    const newData = new AutoComplete({
-      title: `${user.firstName} ${user.lastName}`,
-      section: 'author'
-    })
-    await newData.save()
+      const newUser = new User({
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        password: hashedPassword,
+        googleId: req.body.googleId,
+      });
+      savedUser = await newUser.save();
+      const newData = new AutoComplete({
+        title: `${savedUser.firstName} ${savedUser.lastName}`,
+        section: 'author',
+        refId: savedUser._id.toString()
+      })
+    }
+
+    if (id) {
+      // Update User
+      const updateUser = await User.findById(id);
+
+      if (!updateUser) {
+        res.status(400).json('No User Found!!');
+        return;
+      }
+
+      updateUser.firstName = req.body.firstName;
+      updateUser.lastName = req.body.lastName;
+      updateUser.email = req.body.email;
+      updateUser.avatar = req.body.avatar;
+      updateUser.slogan = req.body.slogan;
+      updateUser.aboutMe = req.body.aboutMe;
+      updateUser.location = req.body.location;
+      updateUser.socialMediaPlatform = req.body.socialMediaPlatform;
+
+      savedUser = await updateUser.save();
+      const ACData = AutoComplete.find({refId: savedUser._id.toString()})
+      if(ACData){
+        ACData.title = `${savedUser.firstName} ${savedUser.lastName}`
+       await ACData.save()
+      }
+    }
+
+    const user = await User.findById(savedUser._id)
+      .select('firstName lastName _id email avatar slogan aboutMe location resourceInfo resourceList socialMediaPlatform myRecipes events images bookmarks favorites followers')
+      .lean();
+
     const token = jwt.sign({ user }, process.env.SECRET, { expiresIn: '24h' });
     // send a response to the front end
     res.status(200).json(token);
   } catch (err) {
-    res.status(400).json('Bad Credentials');
+    console.log(err);
+    res.status(500).json('Something went Wrong!');
   }
 };
 
@@ -65,31 +108,6 @@ const getLogIn = async (req, res) => {
   }
 };
 
-// POSTING Updated User
-const postUpdatedUser = (req, res, next) => {
-  const id = req.params.id;
-  console.log(req.body);
-  User.findById(id)
-    .then((user) => {
-      user.firstName = req.body.firstName;
-      user.lastName = req.body.lastName;
-      user.email = req.body.email;
-      user.avatar = req.body.avatar;
-      user.slogan = req.body.slogan;
-      user.aboutMe = req.body.aboutMe;
-      user.location = req.body.location;
-      user.socialMediaPlatform = req.body.socialMediaPlatform;
-      return user.save();
-    })
-    .then((user) => {
-      const token = jwt.sign({ user }, process.env.SECRET, {
-        expiresIn: '24h',
-      });
-      res.status(200).json(token);
-    })
-    .catch((err) => res.status(400).json(err));
-};
-
 //RETRIEVE A USER BY ID
 const getAUserByID = async (req, res, next) => {
   try {
@@ -104,66 +122,111 @@ const getAUserByID = async (req, res, next) => {
   }
 };
 
+// Login a User with Google
+const getGoogleLogIn = async (req, res) => {
+  try {
+    const email = req.body.email;
+    let user;
+
+    console.log(req.body);
+
+    // Find the user and select necessary fields
+    user = await User.findOne({ email })
+      .select('firstName lastName email password')
+      .lean();
+
+    if (!user) {
+      // create user for google login if user not found!
+      const newUser = new User({
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        password: '',
+        googleId: req.body.googleId,
+      });
+      user = await newUser.save();
+    }
+
+    const loggedUser = {
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    };
+
+    const token = jwt.sign({ user: loggedUser }, process.env.SECRET, {
+      expiresIn: '24h',
+    });
+    // send a response to the front end
+    res.status(200).json(token);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json('Something went Wrong!!');
+  }
+};
+
+//Forgotten Password
+const PostForgottenPassword = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const user = await User.findOne({ email: email });
+    console.log('findUser::', user);
+
+    if (!user) {
+      res.status(400).json('User Not Found!');
+      return;
+    }
+    var createPass = '';
+    var str =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890@#$%&';
+
+    for (let i = 0; i < 6; i++) {
+      var char = Math.floor(Math.random() * str.length + 1);
+      createPass += str.charAt(char);
+    }
+
+    console.log('createPass::', createPass);
+
+    // --- content for mail --- //
+    let sub = 'Reset Your Password';
+    let html = `<h3>
+                  Hello ${user.firstName}, 
+                  <br/> You forget you password, Don't worry Here your new password <u> ${createPass} </u>
+                </h3>
+            <p>If you didn't request for a new password. Then you can safely ignore this email.</p>
+            <br/>
+            <h4>Thank You</h4>`;
+
+    await mailService(user.email, sub, html);
+
+    console.log('findUser._id::::', user._id);
+    console.log('createPass::::', createPass);
+
+    await User.updateOne(
+      {
+        _id: user._id,
+      },
+      {
+        $set: {
+          password: createPass,
+        },
+      }
+    );
+    res.status(200).json('Your new password has been sent on your register mail');
+  } catch (error) {
+    console.log('forgetPassword-Error::', error);
+    res.status(400).json('Something Went Wrong!.');
+  }
+};
+
 // --------------------------------------
 
-// //RETRIEVE ALL USER
-// const getHomepage = async(req, res, next) => {
-//     await User.find().then(users => {
-//         res.send({users});
-//     })
-//     .catch(err => res.status(400).json(err))
-// }
 
-// //  GETTING A USER TO EDIT
-// const getEdit = (req, res, next) => {
-//     const id = req.params.id;
-//     User.findById(id)
-//     .then(data => {
-//         res.send({data})
-//     })
-//     .catch(err => res.status(400).json(err))
-// }
-
-// // POSTING UPDATED USER INFO
-// const postEdit = (req, res, next) => {
-//     const id = req.body.id;
-//     User.findById(id)
-//     .then(user => {
-//         user.FirstName = req.body.firstName;
-//         user.LastName = req.body.lastName;
-//         user.Address = req.body.address;
-//         user.Number = req.body.number;
-//         user.Email = req.body.email;
-//         return user.save()
-//     })
-//     .then((user) => {
-//         // send a response to the front end
-//         res.status(200).json(user)
-//     })
-//     .catch(err => res.status(400).json(err));
-// }
-
-// //DELETING A USER
-// const postDelete = async (req, res, next) => {
-//     const id = req.params.id;
-//     console.log(id)
-//     await User.findByIdAndDelete(id)
-//     .then(result => {
-//         console.log(result)
-//           res.status(200).json(result)
-//       })
-//     .catch(err => res.status(400).json(err))
-// }
 
 module.exports = {
   postCreateUser,
   getLogIn,
-  postUpdatedUser,
   getAUserByID,
-
-  // getHomepage,
-  // getAUserByID,
-  // getEdit,
-  // postEdit,
-  // postDelete,
+  getGoogleLogIn,
+  PostForgottenPassword,
 };

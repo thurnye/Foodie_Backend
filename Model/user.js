@@ -31,6 +31,9 @@ const userSchema = new Schema({
   resourceInfo: {
     type: Schema.Types.String,
   },
+  googleId:{
+    type: Schema.Types.String,
+  },
   resourceList:[{
     type: Object
   }],
