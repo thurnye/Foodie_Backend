@@ -1,3 +1,4 @@
+const User = require('../Model/user');
 const GroupRoom = require('../Chat/WebSocket/models/group.model');
 const AutoComplete = require('../Model/autoComplete');
 const Forums = require('../Model/forums');
@@ -114,7 +115,7 @@ const postRequestToJoinOrLeaveGroup = async (req, res, next) => {
     const group = await GroupRoom.findById(groupId);
 
     if (!group) {
-      return res.status(404).json('Group not found' );
+      return res.status(404).json('Group not found');
     }
 
     // Check if user is already a member of the group
@@ -127,7 +128,7 @@ const postRequestToJoinOrLeaveGroup = async (req, res, next) => {
       const forum = await Forums.findById(group.forumId);
       forum.forumTotalMembers -= 1;
       await forum.save();
-      return res.status(200).json('Successfully Exited Group');
+      return res.status(200).json('exit');
     }
 
     // Check if user is already pending approval
@@ -142,23 +143,21 @@ const postRequestToJoinOrLeaveGroup = async (req, res, next) => {
     group.pendingGroupMembers.unshift(userId);
     await group.save();
 
-    res.status(200).json('Request to Join Group Pending');
+    res.status(200).json('pending');
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .json('Something Went Wrong!');
+    res.status(500).json('Something Went Wrong!');
   }
 };
 
 const getSingleGroup = async (req, res, next) => {
   try {
     console.log(req.params.groupId);
-    const groupId = req.params.groupId
+    const groupId = req.params.groupId;
 
     const group = await GroupRoom.findById(groupId)
       .select(
-        'groupName  startedBy createdAt groupDescription  groupMembers pendingGroupMembers'
+        'groupName forumId startedBy createdAt groupDescription  groupMembers pendingGroupMembers'
       )
       .populate({
         path: 'startedBy',
@@ -189,15 +188,43 @@ const getSingleGroup = async (req, res, next) => {
     res.status(200).json(group);
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json('Something Went Wrong!');
+    res.status(500).json('Something Went Wrong!');
   }
 };
+
+const approveJoinRequest = async (req, res, next) => {
+  try {
+    const { groupId, userId } = req.body;
+
+    const group = await GroupRoom.findById(groupId);
+    if (!group) {
+      return res.status(404).json('Group not found' );
+    }
+
+    group.groupMembers.push(userId);
+    group.pendingGroupMembers = group.pendingGroupMembers.filter(el => el.toString() !== userId.toString());
+
+    // Save the updated group
+    const savedGroupRoom = await group.save();
+
+    // Update forum statistics
+    const forum = await Forums.findById(savedGroupRoom.forumId);
+    if (forum) {
+      forum.forumTotalMembers += 1;
+      await forum.save();
+    }
+    res.status(200).json('confirm');
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Something Went Wrong!', error: error.message });
+  }
+};
+
 
 module.exports = {
   postGroup,
   getGroups,
   postRequestToJoinOrLeaveGroup,
   getSingleGroup,
+  approveJoinRequest
 };

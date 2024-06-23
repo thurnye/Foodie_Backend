@@ -112,9 +112,14 @@ router.get('/group/:groupId', GroupController.getSingleGroup);
 // Join Group Request
 router.post('/group/request', GroupController.postRequestToJoinOrLeaveGroup);
 
+// Approve Group Request
+router.post('/group/approve', GroupController.approveJoinRequest);
+
+
+
 
 // Post
-// Join Group Request
+// post Panel Discussion
 router.post('/panel', GroupPanelController.postGroupDiscussion);
 
 // get all  discussion panels in a group
