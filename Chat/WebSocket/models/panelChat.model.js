@@ -19,13 +19,7 @@ const panelChatSchema = new mongoose.Schema({
       message: {
         type: String,
         required: true,
-      },
-      readBy: [
-        {
-          type: objectId,
-          ref: 'User',
-        }
-      ]
+      }
     }
   ]
 }, {
@@ -36,22 +30,25 @@ const panelChatSchema = new mongoose.Schema({
 const secretKey = process.env.ENCRYPT_SECRET; 
 
 // Encrypt message before saving
-panelChatSchema.pre('save', function(next) {
-  this.chat.forEach(chat => {
-    if (chat.isModified('message')) {
+panelChatSchema.pre('save', function (next) {
+  this.chat.forEach((chat, index) => {
+    if (chat.isModified('message') && !chat.message.startsWith('U2FsdGVkX1')) {
       const encryptedMessage = crypto.AES.encrypt(chat.message, secretKey).toString();
-      chat.message = encryptedMessage;
+      this.chat[index].message = encryptedMessage;
     }
   });
   next();
 });
 
 // Decrypt messages when retrieving
-panelChatSchema.methods.decryptMessages = function() {
-  this.chat.forEach(chat => {
-    const bytes = crypto.AES.decrypt(chat.message, secretKey);
-    chat.message = bytes.toString(crypto.enc.Utf8);
+panelChatSchema.methods.decryptMessages = function () {
+  this.chat.forEach((chat, index) => {
+    if (chat.message.startsWith('U2FsdGVkX1')) {
+      const bytes = crypto.AES.decrypt(chat.message, secretKey);
+      this.chat[index].message = bytes.toString(crypto.enc.Utf8);
+    }
   });
 };
+
 
 module.exports = mongoose.model('panelChat', panelChatSchema);
