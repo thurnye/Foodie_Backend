@@ -26,7 +26,7 @@ const chatSchema = new mongoose.Schema({
       },
       read: {
         type: Number,
-        default: 1
+        default: 0
       }
     }
   ]
@@ -39,22 +39,23 @@ const secretKey = process.env.ENCRYPT_SECRET;
 
 
 // Encrypt message before saving
-chatSchema.pre('save', function(next) {
-  this.chat.forEach(chat => {
-    if (chat.isModified('message')) {
+chatSchema.pre('save', function (next) {
+  this.chat.forEach((chat, index) => {
+    if (chat.isModified('message') && !chat.message.startsWith('U2FsdGVkX1')) {
       const encryptedMessage = crypto.AES.encrypt(chat.message, secretKey).toString();
-      chat.message = encryptedMessage;
+      this.chat[index].message = encryptedMessage;
     }
   });
   next();
 });
 
 // Decrypt messages when retrieving
-chatSchema.methods.decryptMessages = function() {
-  this.chat.forEach(chat => {
-    const bytes = crypto.AES.decrypt(chat.message, secretKey);
-    chat.message = bytes.toString(crypto.enc.Utf8);
+chatSchema.methods.decryptMessages = function () {
+  this.chat.forEach((chat, index) => {
+    if (chat.message.startsWith('U2FsdGVkX1')) {
+      const bytes = crypto.AES.decrypt(chat.message, secretKey);
+      this.chat[index].message = bytes.toString(crypto.enc.Utf8);
+    }
   });
 };
-
 module.exports = mongoose.model('Chat', chatSchema);

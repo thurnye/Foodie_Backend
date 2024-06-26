@@ -10,6 +10,7 @@ const GroupPanelController = require('../Controller/groupPanelController')
 
 
 
+
 const router = require('express').Router()
 
 
@@ -116,16 +117,12 @@ router.post('/group/request', GroupController.postRequestToJoinOrLeaveGroup);
 router.post('/group/approve', GroupController.approveJoinRequest);
 
 
-
-
 // Post
 // post Panel Discussion
 router.post('/panel', GroupPanelController.postGroupDiscussion);
 
 // get all  discussion panels in a group
 router.post('/panel/discussions', GroupPanelController.getGroupDiscussionPanels);
-
-
 
 
 
