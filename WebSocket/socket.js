@@ -204,11 +204,7 @@ function initializeSocket(server) {
           })
           .exec();
 
-        // Decrypt messages for each chat document
-        // chats.forEach((chat) => chat.decryptMessages());
-
-        console.log(chats);
-        console.log(chats);
+        
           const data = chats.map(({_id, chatRoomId, chat}) => ({
             _id,
             chatRoomId,
