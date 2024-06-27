@@ -18,10 +18,6 @@ const groupPanelSchema = mongoose.Schema(
         ref: 'User',
       },
     ],
-    isPrivate:{
-      type: Boolean,
-      default: false
-    },
     startedBy: {
       type: objectId,
       ref: 'User',

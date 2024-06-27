@@ -20,7 +20,7 @@ const groupSchema = mongoose.Schema(
     forumId: {
       type: objectId,
       ref: 'Forums',
-      required: true,
+      require: true
     },
     groupMembers: [
       {

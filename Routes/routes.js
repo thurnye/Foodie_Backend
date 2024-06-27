@@ -7,6 +7,7 @@ const AppController = require('../Controller/appController');
 const ForumController = require('../Controller/forumsController')
 const GroupController = require('../Controller/groupController')
 const GroupPanelController = require('../Controller/groupPanelController')
+const privateGroupController = require('../Controller/privateGroupController')
 
 
 
@@ -115,6 +116,9 @@ router.post('/group/request', GroupController.postRequestToJoinOrLeaveGroup);
 
 // Approve Group Request
 router.post('/group/approve', GroupController.approveJoinRequest);
+
+// create private group
+router.post('/group/private', privateGroupController.postPrivateGroup);
 
 
 // Post
