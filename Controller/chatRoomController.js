@@ -1,4 +1,4 @@
-const ChatRoom = require('../Chat/WebSocket/models/chatRoom.model')
+const ChatRoom = require('../WebSocket/models/chatRoom.model')
 
 //Post a Review
 const postChatRoom = async (req, res, next) => {

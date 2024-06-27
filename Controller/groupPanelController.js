@@ -1,5 +1,5 @@
-const PostRoom = require('../Chat/WebSocket/models/groupPanel.model');
-const GroupRoom = require('../Chat/WebSocket/models/group.model');
+const PostRoom = require('../WebSocket/models/groupPanel.model');
+const GroupRoom = require('../WebSocket/models/group.model');
 const Forums = require('../Model/forums');
 
 const postGroupDiscussion = async (req, res, next) => {

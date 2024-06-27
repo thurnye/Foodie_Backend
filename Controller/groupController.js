@@ -1,8 +1,8 @@
 const User = require('../Model/user');
-const GroupRoom = require('../Chat/WebSocket/models/group.model');
+const GroupRoom = require('../WebSocket/models/group.model');
 const AutoComplete = require('../Model/autoComplete');
 const Forums = require('../Model/forums');
-const PostRoom = require('../Chat/WebSocket/models/groupPanel.model');
+const PostRoom = require('../WebSocket/models/groupPanel.model');
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Types;
 

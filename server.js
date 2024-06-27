@@ -7,7 +7,7 @@ require('dotenv').config();
 require('./DataBase/index');
 const route = require('./Routes/routes');
 const mongoose = require('mongoose');
-const initializeSocket = require('./Chat/WebSocket/Socket');
+const initializeSocket = require('./WebSocket/Socket');
 
 const PORT = process.env.PORT || 8670;
 const app = express();
