@@ -1,3 +1,4 @@
+
 const socketIO = require('socket.io');
 const PanelChat = require('./models/panelChat.model');
 const Chat = require('./models/chat.model');
@@ -71,27 +72,31 @@ function initializeSocket(server) {
     // ==========================================================================================
 
     // Single Chat
-    socket.on('joinChatRoom', async ({ userId, receiverId }) => {
+    socket.on('joinChatRoom', async ({ userId, receiverId, roomId }) => {
       try {
-        // Check if a chat room already exists between these users in either order
-        let chatRoom = await ChatRoom.findOne({
-          $or: [
-            { user1: userId, user2: receiverId },
-            { user1: receiverId, user2: userId },
-          ],
-        });
-
-        if (!chatRoom) {
-          chatRoom = new ChatRoom({ user1: userId, user2: receiverId });
-          await chatRoom.save();
-          console.log('Chat room created');
+        let chatRoomId = roomId;
+        if(!chatRoomId){
+          // Check if a chat room already exists between these users in either order
+          let chatRoom = await ChatRoom.findOne({
+            $or: [
+              { user1: userId, user2: receiverId },
+              { user1: receiverId, user2: userId },
+            ],
+          });
+  
+          if (!chatRoom) {
+            chatRoom = new ChatRoom({ user1: userId, user2: receiverId });
+            await chatRoom.save();
+            console.log('Chat room created');
+          }
+          chatRoomId = chatRoom._id.toString();
         }
 
-        socket.join(chatRoom._id.toString());
-        console.log(`User ${userId} joined room ${chatRoom._id}`);
+        socket.join(chatRoomId);
+        console.log(`User ${userId} joined room ${chatRoomId}`);
 
         // Fetch chat history
-        const chatHistory = await Chat.findOne({ chatRoomId: chatRoom._id })
+        const chatHistory = await Chat.findOne({ chatRoomId })
           .populate({
             path: 'chat.sender chat.receiver',
             select: '_id firstName lastName avatar',
@@ -102,12 +107,12 @@ function initializeSocket(server) {
           // Decrypt messages
           chatHistory.decryptMessages();
           socket.emit('joinedChatRoom', {
-            roomId: chatRoom._id,
+            roomId: chatRoomId,
             chatHistory: chatHistory.chat,
           });
         } else {
           socket.emit('joinedChatRoom', {
-            roomId: chatRoom._id,
+            roomId: chatRoomId,
             chatHistory: [],
           });
         }
