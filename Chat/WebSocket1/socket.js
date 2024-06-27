@@ -123,6 +123,8 @@ function initializeSocket(server) {
       try {
         console.log({ roomId, sender, receiverId, message });
         let singleRoom = await Chat.findOne({ chatRoomId: roomId }).exec();
+
+        console.log(singleRoom)
         if (!singleRoom) {
           singleRoom = new Chat({ chatRoomId: roomId, chat: [] });
         }
@@ -140,7 +142,7 @@ function initializeSocket(server) {
 
         singleRoom.decryptMessages();
 
-        // console.log(singleRoom);
+        console.log(singleRoom);
 
         io.to(roomId).emit(
           'newChat',
@@ -188,21 +190,18 @@ function initializeSocket(server) {
       try {
         const chats = await Chat.find({
           $or: [
-            { 'chat.sender': userId },
-            { 'chat.receiver':userId},
+            { 'chat.sender': userId},
+            { 'chat.receiver': userId },
           ],
         })
           .sort({ updatedAt: -1 })
+          .select('')
           .populate({
             path: 'chat.sender chat.receiver',
             select: '_id firstName lastName avatar',
           })
           .exec();
 
-        // Decrypt messages for each chat document
-        // chats.forEach((chat) => chat.decryptMessages());
-
-        console.log(chats);
         console.log(chats);
           const data = chats.map(({_id, chatRoomId, chat}) => ({
             _id,
