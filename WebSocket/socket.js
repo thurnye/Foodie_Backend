@@ -1,8 +1,8 @@
-
 const socketIO = require('socket.io');
 const PanelChat = require('./models/panelChat.model');
 const Chat = require('./models/chat.model');
 const ChatRoom = require('./models/chatRoom.model');
+const PrivateGroup = require('../Model/privateGroup');
 
 function initializeSocket(server) {
   const io = socketIO(server, {
@@ -75,7 +75,7 @@ function initializeSocket(server) {
     socket.on('joinChatRoom', async ({ userId, receiverId, roomId }) => {
       try {
         let chatRoomId = roomId;
-        if(!chatRoomId){
+        if (!chatRoomId) {
           // Check if a chat room already exists between these users in either order
           let chatRoom = await ChatRoom.findOne({
             $or: [
@@ -83,7 +83,7 @@ function initializeSocket(server) {
               { user1: receiverId, user2: userId },
             ],
           });
-  
+
           if (!chatRoom) {
             chatRoom = new ChatRoom({ user1: userId, user2: receiverId });
             await chatRoom.save();
@@ -192,10 +192,7 @@ function initializeSocket(server) {
     socket.on('chatList', async ({ userId }) => {
       try {
         const chats = await Chat.find({
-          $or: [
-            { 'chat.sender': userId },
-            { 'chat.receiver':userId},
-          ],
+          $or: [{ 'chat.sender': userId }, { 'chat.receiver': userId }],
         })
           .sort({ updatedAt: -1 })
           .populate({
@@ -204,16 +201,46 @@ function initializeSocket(server) {
           })
           .exec();
 
-        
-          const data = chats.map(({_id, chatRoomId, chat}) => ({
-            _id,
-            chatRoomId,
-            otherUser: chat[0].sender._id !== userId ? chat[0].receiver : chat[0].sender,
-            type:'singleChat'
-          }))
+        const groups = await PrivateGroup.find({ groupMembers: userId })
+        .select('groupName groupDescription groupMembers startedBy updatedAt')
+        .populate({
+          path: 'groupMembers startedBy',
+          select: '_id firstName lastName avatar',
+        })
+        .exec();
+
+        console.log(groups)
+
+        const groupData = groups.map(({_id,groupName, groupDescription, groupMembers, startedBy, updatedAt}) => ({
+          _id,
+          chatRoomId: _id,
+          updatedAt,
+          groupName, 
+          groupDescription, 
+          groupMembers, 
+          startedBy,
+          type:'groupChat'
+        }))
+
+
+        const data = chats.map(({ _id, chatRoomId, chat, updatedAt }) => ({
+          _id,
+          chatRoomId,
+          otherUser:
+            chat[0].sender._id !== userId ? chat[0].receiver : chat[0].sender,
+          type: 'singleChat',
+          updatedAt
+        }));
+
+        const allList = [...data, ...groupData].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
 
         // Emit the chats to the client
-        socket.emit('allChatsLists', { chatLists: data });
+        socket.emit('allChatsLists', {
+          chatLists: data,
+          groupList: groups,
+          allList
+        });
       } catch (error) {
         console.error('Error retrieving chats:', error);
         socket.emit('error', 'Error retrieving chats');

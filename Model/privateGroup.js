@@ -10,7 +10,7 @@ const privateGroupSchema = new mongoose.Schema({
   groupDescription: {
     type: String,
   },
-  members: [
+  groupMembers: [
     {
       type: objectId,
       ref: 'User',
