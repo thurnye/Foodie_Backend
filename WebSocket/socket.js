@@ -202,26 +202,34 @@ function initializeSocket(server) {
           .exec();
 
         const groups = await PrivateGroup.find({ groupMembers: userId })
-        .select('groupName groupDescription groupMembers startedBy updatedAt')
-        .populate({
-          path: 'groupMembers startedBy',
-          select: '_id firstName lastName avatar',
-        })
-        .exec();
+          .select('groupName groupDescription groupMembers startedBy updatedAt')
+          .populate({
+            path: 'groupMembers startedBy',
+            select: '_id firstName lastName avatar',
+          })
+          .exec();
 
-        console.log(groups)
+        console.log(groups);
 
-        const groupData = groups.map(({_id,groupName, groupDescription, groupMembers, startedBy, updatedAt}) => ({
-          _id,
-          chatRoomId: _id,
-          updatedAt,
-          groupName, 
-          groupDescription, 
-          groupMembers, 
-          startedBy,
-          type:'groupChat'
-        }))
-
+        const groupData = groups.map(
+          ({
+            _id,
+            groupName,
+            groupDescription,
+            groupMembers,
+            startedBy,
+            updatedAt,
+          }) => ({
+            _id,
+            chatRoomId: _id,
+            updatedAt,
+            groupName,
+            groupDescription,
+            groupMembers,
+            startedBy,
+            type: 'groupChat',
+          })
+        );
 
         const data = chats.map(({ _id, chatRoomId, chat, updatedAt }) => ({
           _id,
@@ -229,21 +237,67 @@ function initializeSocket(server) {
           otherUser:
             chat[0].sender._id !== userId ? chat[0].receiver : chat[0].sender,
           type: 'singleChat',
-          updatedAt
+          updatedAt,
         }));
 
-        const allList = [...data, ...groupData].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-
+        const allList = [...data, ...groupData].sort(
+          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+        );
 
         // Emit the chats to the client
         socket.emit('allChatsLists', {
           chatLists: data,
           groupList: groups,
-          allList
+          allList,
         });
       } catch (error) {
         console.error('Error retrieving chats:', error);
         socket.emit('error', 'Error retrieving chats');
+      }
+    });
+
+    socket.on('joinPrivateGroup', async ({ roomId, type }) => {
+      try {
+        if (type === 'groupChat') {
+          socket.join(roomId);
+          console.log('joined private', roomId);
+          const groupChatHistory = await PrivateGroup.findById(roomId)
+            .populate({
+              path: 'chat.sender',
+              select: '_id firstName lastName avatar',
+            })
+            .exec();
+          if (groupChatHistory) {
+            groupChatHistory.decryptMessages();
+            socket.emit('groupChatHistory', groupChatHistory.chat);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
+    socket.on('sendPrivateGroupMessage', async ({ roomId, sender, message }) => {
+      try {
+        const chat = { sender, message };
+          const group = await PrivateGroup.findById(roomId);
+          if(group){
+            console.log(group)
+            group.chat.push(chat);
+            await group.save();
+          }
+
+          await PrivateGroup.populate(group, {
+            path: 'chat.sender',
+            select: '_id firstName lastName avatar',
+          });
+
+          group.decryptMessages();
+    
+          io.to(roomId).emit('newChat', group.chat[group.chat.length - 1]);
+        
+      } catch (error) {
+        console.log(error)
       }
     });
 
