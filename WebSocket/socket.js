@@ -267,9 +267,14 @@ function initializeSocket(server) {
               select: '_id firstName lastName avatar',
             })
             .exec();
+
+            console.log(groupChatHistory)
           if (groupChatHistory) {
             groupChatHistory.decryptMessages();
-            socket.emit('groupChatHistory', groupChatHistory.chat);
+            socket.emit('joinedChatRoom', {
+              roomId,
+              chatHistory: groupChatHistory.chat,
+            });
           }
         }
       } catch (error) {
