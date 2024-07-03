@@ -15,7 +15,7 @@ function initializeSocket(server) {
   const typingUsers = {};
 
   io.on('connection', (socket) => {
-    console.log('A user connected');
+  console.log('A user connected');
 
     // Join Group
     socket.on('join group', async (groupId) => {
@@ -40,7 +40,7 @@ function initializeSocket(server) {
     // Send Group Message
     socket.on('sendMessage', async ({ panelId, sender, message }) => {
       try {
-        console.log({ panelId, sender, message });
+        ////console.log()g()g({ panelId, sender, message });
         let postChat = await PanelChat.findOne({ panelId }).exec();
         if (!postChat) {
           postChat = new PanelChat({ panelId, chat: [] });
@@ -55,7 +55,7 @@ function initializeSocket(server) {
 
         postChat.decryptMessages();
 
-        console.log(postChat);
+        ////console.log()g()g(postChat);
 
         io.to(panelId).emit('message', postChat.chat[postChat.chat.length - 1]);
       } catch (err) {
@@ -87,13 +87,12 @@ function initializeSocket(server) {
           if (!chatRoom) {
             chatRoom = new ChatRoom({ user1: userId, user2: receiverId });
             await chatRoom.save();
-            console.log('Chat room created');
+            ////console.log()g()g('Chat room created');
           }
           chatRoomId = chatRoom._id.toString();
         }
 
         socket.join(chatRoomId);
-        console.log(`User ${userId} joined room ${chatRoomId}`);
 
         // Fetch chat history
         const chatHistory = await Chat.findOne({ chatRoomId })
@@ -126,7 +125,6 @@ function initializeSocket(server) {
 
     socket.on('sendChat', async ({ roomId, sender, receiverId, message }) => {
       try {
-        console.log({ roomId, sender, receiverId, message });
         let singleRoom = await Chat.findOne({ chatRoomId: roomId }).exec();
         if (!singleRoom) {
           singleRoom = new Chat({ chatRoomId: roomId, chat: [] });
@@ -145,7 +143,7 @@ function initializeSocket(server) {
 
         singleRoom.decryptMessages();
 
-        // console.log(singleRoom);
+        // ////console.log()g()g(singleRoom);
 
         io.to(roomId).emit(
           'newChat',
@@ -185,14 +183,14 @@ function initializeSocket(server) {
     // });
 
     socket.emit("me", socket.id);
-    
+
     socket.on("callUser", (data) => {
-      io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
-    })
-  
+        io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name });
+    });
+
     socket.on("answerCall", (data) => {
-      io.to(data.to).emit("callAccepted", data.signal)
-    })
+        io.to(data.to).emit("callAccepted", data.signal);
+    });
 
 
     // ==========================================================================================
@@ -220,7 +218,7 @@ function initializeSocket(server) {
           })
           .exec();
 
-        console.log(groups);
+
 
         const groupData = groups.map(
           ({
@@ -271,7 +269,7 @@ function initializeSocket(server) {
       try {
         if (type === 'groupChat') {
           socket.join(roomId);
-          console.log('joined private', roomId);
+          ////console.log()g()g('joined private', roomId);
           const groupChatHistory = await PrivateGroup.findById(roomId)
             .populate({
               path: 'chat.sender',
@@ -279,7 +277,7 @@ function initializeSocket(server) {
             })
             .exec();
 
-            console.log(groupChatHistory)
+            ////console.log()g()g(groupChatHistory)
           if (groupChatHistory) {
             groupChatHistory.decryptMessages();
             socket.emit('joinedChatRoom', {
@@ -298,7 +296,7 @@ function initializeSocket(server) {
         const chat = { sender, message };
           const group = await PrivateGroup.findById(roomId);
           if(group){
-            console.log(group)
+            ////console.log()g()g(group)
             group.chat.push(chat);
             await group.save();
           }
