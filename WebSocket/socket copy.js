@@ -13,6 +13,7 @@ function initializeSocket(server) {
   });
 
   const typingUsers = {};
+  const rooms = {}
 
   io.on('connection', (socket) => {
   console.log('A user connected');
@@ -157,66 +158,36 @@ function initializeSocket(server) {
     // ==========================================================================================
     // Video Chat Offer
 
-    // socket.on('join video room', (roomId) => {
-    //   if (rooms[roomId]) {
-    //     rooms[roomId].push(socket.id);
-    //   } else {
-    //     rooms[roomId] = [socket.id];
-    //   }
-    //   const otherUser = rooms[roomId].find((id) => id !== socket.id);
-    //   if (otherUser) {
-    //     socket.emit('other user', otherUser);
-    //     socket.to(otherUser).emit('user joined', socket.id);
-    //   }
-    // });
+    
 
-    // socket.on('offer', (payload) => {
-    //   io.to(payload.target).emit('offer', payload);
-    // });
 
-    // socket.on('answer', (payload) => {
-    //   io.to(payload.target).emit('answer', payload);
-    // });
 
-    // socket.on('ice-candidate', (incoming) => {
-    //   io.to(incoming.target).emit('ice-candidate', incoming.candidate); // for best connection btwn candidates
-    // });
-
-    socket.emit("me", socket.id);
-
-     socket.on('join video room', (roomId) => {
-      console.log({roomId})
-      // if (rooms[roomId]) {
-      //   rooms[roomId].push(socket.id);
-      // } else {
-      //   rooms[roomId] = [socket.id];
-      // }
-      // const otherUser = rooms[roomId].find((id) => id !== socket.id);
-      // if (otherUser) {
-      //   socket.emit('other user', otherUser);
-      //   socket.to(otherUser).emit('user joined', socket.id);
-      // }
-      socket.emit("me", socket.id);
+    socket.on('join video room', (roomId) => {
+      socket.join(roomId);
+      console.log('Joined video room:', roomId);
+      socket.emit('me', socket.id);
     });
 
-    socket.on("callUser", (data) => {
-      console.log("Call User", data);
-      io.to(data.userToCall).emit("callUser", {
+    socket.on('callUser', (data) => {
+      console.log('Call User:', data);
+      io.to(data.roomId).emit('callUser', {
         signal: data.signalData,
         from: data.from,
-        name: data.name
+        name: data.name,
+        roomId: data.roomId // Ensure roomId is included in the data
       });
     });
-  
-    socket.on("answerCall", (data) => {
-      console.log("Answer Call", data);
-      io.to(data.to).emit("callAccepted", data.signal);
+    
+    socket.on('answerCall', (data) => {
+      console.log('Answer Call', data);
+      io.to(data.to).emit('callAccepted', data.signal);
     });
-  
-    socket.on("leaveCall", (data) => {
-      console.log("Leave Call", data);
-      io.to(data.to).emit("callEnded");
+    
+    socket.on('leaveCall', (data) => {
+      console.log('Leave Call', data);
+      io.to(data.to).emit('callEnded');
     });
+    
 
 
     // ==========================================================================================
