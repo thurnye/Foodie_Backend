@@ -192,6 +192,10 @@ function initializeSocket(server) {
         io.to(data.to).emit("callAccepted", data.signal);
     });
 
+    socket.on("leaveCall", (data) => {
+        io.to(data.to).emit("callEnded");
+    });
+
 
     // ==========================================================================================
 
@@ -244,10 +248,11 @@ function initializeSocket(server) {
           _id,
           chatRoomId,
           otherUser:
-            chat[0].sender._id !== userId ? chat[0].receiver : chat[0].sender,
+            chat[0].sender._id.toString() === userId.toString() ? chat[0].receiver : chat[0].sender,
           type: 'singleChat',
           updatedAt,
         }));
+        
 
         const allList = [...data, ...groupData].sort(
           (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
