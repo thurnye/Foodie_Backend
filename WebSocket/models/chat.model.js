@@ -2,7 +2,11 @@ const mongoose = require('mongoose');
 const crypto = require('crypto-js');
 const objectId = mongoose.Schema.Types.ObjectId;
 
-
+const imageSchema = new mongoose.Schema({
+  data: Buffer,
+  contentType: String,
+  name: String,
+});
 
 const chatSchema = new mongoose.Schema({
   chatRoomId: {
@@ -22,8 +26,10 @@ const chatSchema = new mongoose.Schema({
       },
       message: {
         type: String,
-        required: true
+        // required: true
       },
+      image:imageSchema,
+
       read: {
         type: Number,
         default: 0

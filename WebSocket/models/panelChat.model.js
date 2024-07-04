@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 const crypto = require('crypto-js');
 const objectId = mongoose.Schema.Types.ObjectId;
 
+const imageSchema = new mongoose.Schema({
+  data: Buffer,
+  contentType: String,
+  name: String,
+});
+
 const panelChatSchema = new mongoose.Schema({
   panelId: {
     type: objectId,
@@ -18,7 +24,8 @@ const panelChatSchema = new mongoose.Schema({
       message: {
         type: String,
         required: true,
-      }
+      },
+      image: imageSchema,
     }
   ]
 }, {

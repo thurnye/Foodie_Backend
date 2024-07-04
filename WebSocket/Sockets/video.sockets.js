@@ -4,6 +4,11 @@ const ChatRoom = require('../models/chatRoom.model');
 const PrivateGroup = require('../../Model/privateGroup');
 
 const rooms = {};
+const callIds = new Map(); 
+
+function generateUniqueId() {
+  return Math.random().toString(36).substr(2, 9); // Generate a random ID
+}
 
 module.exports = (io, socket) => {
  // Video Chat Offer
@@ -36,68 +41,32 @@ module.exports = (io, socket) => {
     // ----
     // socket.emit("me", socket.id);
 
-    //  socket.on('join video room', (roomId) => {
-    //   console.log({roomId})
-    //   socket.emit("me", socket.id);
-    // });
+     socket.on('join video room', (roomId) => {
+      console.log({roomId})
+      socket.emit("me", socket.id);
+    });
 
-    // socket.on("callUser", (data) => {
-    //   console.log("Call User", data);
-    //   io.to(data.userToCall).emit("callUser", {
-    //     signal: data.signalData,
-    //     from: data.from,
-    //     name: data.name
-    //   });
-    // });
+    socket.on("callUser", (data) => {
+      console.log("Call User", data);
+      io.to(data.userToCall).emit("callUser", {
+        signal: data.signalData,
+        from: data.from,
+        name: data.name
+      });
+    });
   
-    // socket.on("answerCall", (data) => {
-    //   console.log("Answer Call", data);
-    //   io.to(data.to).emit("callAccepted", data.signal);
-    // });
+    socket.on("answerCall", (data) => {
+      console.log("Answer Call", data);
+      io.to(data.to).emit("callAccepted", data.signal);
+    });
   
-    // socket.on("leaveCall", (data) => {
-    //   console.log("Leave Call", data);
-    //   io.to(data.to).emit("callEnded");
-    // });
+    socket.on("leaveCall", (data) => {
+      console.log("Leave Call", data);
+      io.to(data.to).emit("callEnded");
+    });
 
-    socket.on('joinRoom', (roomId) => {
-        if (!rooms[roomId]) rooms[roomId] = [];
-        rooms[roomId].push(socket.id);
-        socket.join(roomId);
-        console.log(`Socket ${socket.id} joined room ${roomId}`);
-      });
-    
-      socket.on('requestVideoCall', ({ roomId }) => {
-        const otherUsers = rooms[roomId].filter(id => id !== socket.id);
-        if (otherUsers.length > 0) {
-          const recipient = otherUsers[0]; // assuming 1-on-1 call
-          io.to(recipient).emit('incomingCall', { caller: socket.id });
-        }
-      });
-    
-      socket.on('acceptCall', ({ roomId }) => {
-        const otherUsers = rooms[roomId].filter(id => id !== socket.id);
-        if (otherUsers.length > 0) {
-          const caller = otherUsers[0]; // assuming 1-on-1 call
-          io.to(caller).emit('callAccepted');
-          io.to(socket.id).emit('callAccepted');
-        }
-      });
-    
-      socket.on('declineCall', ({ roomId }) => {
-        const otherUsers = rooms[roomId].filter(id => id !== socket.id);
-        if (otherUsers.length > 0) {
-          const caller = otherUsers[0]; // assuming 1-on-1 call
-          io.to(caller).emit('callDeclined');
-        }
-      });
-    
-      socket.on('signal', ({ roomId, signal }) => {
-        const otherUsers = rooms[roomId].filter(id => id !== socket.id);
-        if (otherUsers.length > 0) {
-          const recipient = otherUsers[0]; // assuming 1-on-1 call
-          io.to(recipient).emit('signal', { signal });
-        }
-      });
+
+
+
   
 };

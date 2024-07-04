@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 const crypto = require('crypto-js');
 const objectId = mongoose.Schema.Types.ObjectId;
 
+const imageSchema = new mongoose.Schema({
+  data: Buffer,
+  contentType: String,
+  name: String,
+});
+
 const privateGroupSchema = new mongoose.Schema({
   groupName: {
     type: String,
@@ -31,7 +37,8 @@ const privateGroupSchema = new mongoose.Schema({
       message: {
         type: String,
         required: true,
-      }
+      },
+      image: imageSchema,
     }
   ]
 }, {
