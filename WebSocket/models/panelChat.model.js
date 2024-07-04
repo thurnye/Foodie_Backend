@@ -23,7 +23,7 @@ const panelChatSchema = new mongoose.Schema({
       },
       message: {
         type: String,
-        required: true,
+        // required: true,
       },
       image: imageSchema,
     }

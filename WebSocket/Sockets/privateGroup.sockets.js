@@ -89,9 +89,16 @@ module.exports = (io, socket) => {
                   ////console.log()g()g(groupChatHistory)
                 if (groupChatHistory) {
                   groupChatHistory.decryptMessages();
+                  const transformedChatHistory = groupChatHistory.chat.map(chat => {
+                    const chatObject = chat.toObject();
+                    if (chatObject.image) {
+                      chatObject.image.data = chatObject.image.data.toString('base64');
+                    }
+                    return chatObject;
+                  });
                   socket.emit('joinedChatRoom', {
                     roomId,
-                    chatHistory: groupChatHistory.chat,
+                    chatHistory: transformedChatHistory,
                   });
                 }
               }
@@ -121,6 +128,52 @@ module.exports = (io, socket) => {
               
             } catch (error) {
               console.log(error)
+            }
+          });
+
+          socket.on('sendPrivateGroupImage', async (data) => {
+            try {
+        
+              const roomId = data.roomId;
+              const sender = data.sender;
+              const imageBuffer = Buffer.from(data.image);
+              const imageName = data.imageName;
+              const imageType = data.imageType;
+        
+              let singleRoom = await PrivateGroup.findById(roomId).exec();
+              
+              if (singleRoom) {
+                singleRoom.chat.push({
+                  sender,
+                  message: '',
+                  image: {
+                    data: imageBuffer,
+                    contentType: imageType,
+                    name: imageName,
+                  },
+                });
+                await singleRoom.save();
+              }
+        
+              await PrivateGroup.populate(singleRoom, {
+                path: 'chat.sender',
+                select: '_id firstName lastName avatar',
+              });
+        
+              singleRoom.decryptMessages();
+        
+              io.to(roomId).emit(
+                'newChat',
+                {
+                  ...singleRoom.chat[singleRoom.chat.length - 1].toObject(),
+                  image: {
+                    ...singleRoom.chat[singleRoom.chat.length - 1].image.toObject(),
+                    data: imageBuffer.toString('base64')
+                  }
+                }
+              );
+            } catch (err) {
+              console.error('Error sending image:', err);
             }
           });
 };

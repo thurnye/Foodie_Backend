@@ -17,7 +17,14 @@ module.exports = (io, socket) => {
   
           if (postChatHistory) {
             postChatHistory.decryptMessages();
-            socket.emit('group chat history', postChatHistory.chat);
+            const transformedChatHistory = postChatHistory.chat.map(chat => {
+              const chatObject = chat.toObject();
+              if (chatObject.image) {
+                chatObject.image.data = chatObject.image.data.toString('base64');
+              }
+              return chatObject;
+            });
+            socket.emit('group chat history', transformedChatHistory);
           }
         } catch (err) {
           console.error(err);
@@ -47,6 +54,54 @@ module.exports = (io, socket) => {
           io.to(panelId).emit('message', postChat.chat[postChat.chat.length - 1]);
         } catch (err) {
           console.error(err);
+        }
+      });
+
+      socket.on('sendGroupImage', async (data) => {
+        try {
+          console.log('sendImage event received:', data);
+    
+          const roomId = data.roomId;
+          const sender = data.sender;
+          const imageBuffer = Buffer.from(data.image);
+          const imageName = data.imageName;
+          const imageType = data.imageType;
+          const chatType = data.chatType
+    
+          let singleRoom = await Panel.findOne({ panelId: roomId }).exec();
+          if (!singleRoom) {
+            singleRoom = new PanelChat({ panelId, chat: [] });
+          }
+          singleRoom.chat.push({
+            sender,
+            message: '',
+            image: {
+              data: imageBuffer,
+              contentType: imageType,
+              name: imageName,
+            },
+          });
+          await singleRoom.save();
+    
+          await PanelChat.populate(singleRoom, {
+            path: 'chat.sender',
+            select: '_id firstName lastName avatar',
+          });
+    
+          singleRoom.decryptMessages();
+    
+          io.to(roomId).emit(
+            'message',
+            {
+              ...singleRoom.chat[singleRoom.chat.length - 1].toObject(),
+              image: {
+                ...singleRoom.chat[singleRoom.chat.length - 1].image.toObject(),
+                data: imageBuffer.toString('base64')
+              }
+            }
+          );
+        } catch (err) {
+          console.error('Error sending image:', err);
         }
       });
 };

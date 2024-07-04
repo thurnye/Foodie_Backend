@@ -1,8 +1,5 @@
-const mongoose = require('mongoose');
-const PanelChat = require('../models/panelChat.model');
 const Chat = require('../models/chat.model');
 const ChatRoom = require('../models/chatRoom.model');
-const PrivateGroup = require('../../Model/privateGroup');
 
 module.exports = (io, socket) => {
   socket.on('joinChatRoom', async ({ userId, receiverId, roomId }) => {
@@ -11,7 +8,6 @@ module.exports = (io, socket) => {
 
       let chatRoomId = roomId;
       if (!chatRoomId) {
-        console.log('No roomId provided, finding or creating chat room...');
         let chatRoom = await ChatRoom.findOne({
           $or: [
             { user1: userId, user2: receiverId },
@@ -27,7 +23,6 @@ module.exports = (io, socket) => {
         chatRoomId = chatRoom._id.toString();
       }
 
-      console.log('Joining room:', chatRoomId);
       socket.join(chatRoomId);
 
       const chatHistory = await Chat.findOne({ chatRoomId })
@@ -37,10 +32,8 @@ module.exports = (io, socket) => {
         })
         .exec();
 
-      console.log('Chat history fetched for room:', chatRoomId);
 
       if (chatHistory) {
-        console.log('Original chatHistory:', chatHistory.chat);
         chatHistory.decryptMessages();
         const transformedChatHistory = chatHistory.chat.map(chat => {
           const chatObject = chat.toObject();
@@ -49,7 +42,6 @@ module.exports = (io, socket) => {
           }
           return chatObject;
         });
-        console.log('Transformed chatHistory:', transformedChatHistory);
         socket.emit('joinedChatRoom', {
           roomId: chatRoomId,
           chatHistory: transformedChatHistory,
@@ -61,7 +53,6 @@ module.exports = (io, socket) => {
         });
       }
     } catch (error) {
-      console.error('Error joining room:', error);
       socket.emit('error', {
         message: 'An error occurred while joining the chat room.',
       });
@@ -70,7 +61,6 @@ module.exports = (io, socket) => {
 
   socket.on('sendChat', async ({ roomId, sender, receiverId, message }) => {
     try {
-      console.log('sendChat event received:', { roomId, sender, receiverId, message });
 
       let singleRoom = await Chat.findOne({ chatRoomId: roomId }).exec();
       if (!singleRoom) {
@@ -109,6 +99,7 @@ module.exports = (io, socket) => {
       const imageBuffer = Buffer.from(data.image);
       const imageName = data.imageName;
       const imageType = data.imageType;
+      const chatType = data.chatType
 
       let singleRoom = await Chat.findOne({ chatRoomId: roomId }).exec();
       if (!singleRoom) {
