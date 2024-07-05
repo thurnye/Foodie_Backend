@@ -179,13 +179,25 @@ module.exports = (io, socket) => {
     try {
       console.log(data)
       const { _id, user, chatRoomId } = data;
-      const group = await PrivateGroup.findById(_id);
+      const group = await PrivateGroup.findById(_id).populate({
+        path: 'chat.sender',
+        select: '_id firstName lastName avatar',
+      })
+      .exec();
+
       if (group) {
         group.groupName = data.groupName;
         group.groupAvatar = data.groupAvatar;
         group.groupDescription = data.groupDescription;
 
         const result = await group.save();
+
+        await PrivateGroup.populate(result, {
+          path: ' groupMembers chat.sender',
+          select: '_id firstName lastName avatar',
+        });
+
+        console.log(result)
 
         const {
           groupName,
