@@ -13,6 +13,9 @@ const privateGroupSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  groupAvatar: {
+    type: String
+  },
   groupDescription: {
     type: String,
   },
