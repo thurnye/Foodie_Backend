@@ -2,6 +2,7 @@ const PanelChat = require('../models/panelChat.model');
 const Chat = require('../models/chat.model');
 const ChatRoom = require('../models/chatRoom.model');
 const PrivateGroup = require('../../Model/privateGroup');
+const { getRandomInt } = require('../../Utils/common');
 
 module.exports = (io, socket) => {
         // Private Chat List
@@ -44,6 +45,7 @@ module.exports = (io, socket) => {
                   groupMembers,
                   startedBy,
                   type: 'groupChat',
+                  randomId: getRandomInt()
                 })
               );
       
@@ -54,6 +56,7 @@ module.exports = (io, socket) => {
                   chat[0].sender._id.toString() === userId.toString() ? chat[0].receiver : chat[0].sender,
                 type: 'singleChat',
                 updatedAt,
+                randomId: getRandomInt(),
               }));
       
               
