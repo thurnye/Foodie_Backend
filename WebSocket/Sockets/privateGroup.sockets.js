@@ -81,7 +81,6 @@ module.exports = (io, socket) => {
     try {
       if (type === 'groupChat') {
         socket.join(roomId);
-        ////console.log()g()g('joined private', roomId);
         const groupChatHistory = await PrivateGroup.findById(roomId)
           .populate({
             path: 'chat.sender',
@@ -89,7 +88,6 @@ module.exports = (io, socket) => {
           })
           .exec();
 
-        ////console.log()g()g(groupChatHistory)
         if (groupChatHistory) {
           groupChatHistory.decryptMessages();
           const transformedChatHistory = groupChatHistory.chat.map((chat) => {
@@ -115,7 +113,6 @@ module.exports = (io, socket) => {
       const chat = { sender, message };
       const group = await PrivateGroup.findById(roomId);
       if (group) {
-        ////console.log()g()g(group)
         group.chat.push(chat);
         await group.save();
       }
@@ -177,7 +174,6 @@ module.exports = (io, socket) => {
 
   socket.on('updatePrivateGroupInfo', async (data) => {
     try {
-      console.log(data)
       const { _id, user, chatRoomId } = data;
       const group = await PrivateGroup.findById(_id).populate({
         path: 'chat.sender',
@@ -196,8 +192,6 @@ module.exports = (io, socket) => {
           path: ' groupMembers chat.sender',
           select: '_id firstName lastName avatar',
         });
-
-        console.log(result)
 
         const {
           groupName,
