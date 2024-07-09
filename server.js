@@ -1,4 +1,3 @@
-// backend/server.js
 const express = require('express');
 const path = require('path');
 const http = require('http');
@@ -7,7 +6,7 @@ require('dotenv').config();
 require('./DataBase/index');
 const route = require('./Routes/routes');
 const mongoose = require('mongoose');
-const initializeSocket = require('./WebSocket/Socket');
+const initializeSocket = require('./WebSocket/socket');
 
 const PORT = process.env.PORT || 8670;
 const app = express();
