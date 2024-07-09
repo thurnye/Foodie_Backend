@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
@@ -22,7 +23,8 @@
     "node-html-parser": "^6.1.13",
     "nodemon": "^3.1.0",
     "pdf-merger-js": "^5.1.1",
-    "puppeteer": "^22.10.0"
+    "puppeteer": "^22.10.0",
+    "socket.io": "^4.7.5"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2"

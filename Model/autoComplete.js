@@ -7,8 +7,11 @@ const autoCompleteSchema = new Schema(
     section: {
       type: String,
       required: true,
-      enum: ['category', 'recipe', 'event', 'author'],
+      enum: ['category', 'recipe', 'event', 'author', 'forum', 'group'],
     },
+    refId: {
+      type: String
+    }
   },
   {
     timestamps: true,

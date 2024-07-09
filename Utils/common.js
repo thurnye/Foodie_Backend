@@ -51,7 +51,14 @@ const filterSchedule = (schedule) => {
 
       return sortedSchedule;
 }
+
+// Random Int for Keys
+const getRandomInt = () => {
+  return Math.floor(Math.random() * 500000000000);
+};
+
 module.exports = {
     getAllDatesInRange,
-    filterSchedule
+    filterSchedule,
+    getRandomInt
 };

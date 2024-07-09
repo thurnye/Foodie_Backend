@@ -4,6 +4,13 @@ const EventController = require('../Controller/eventController');
 const UserController = require('../Controller/userController');
 const CookBookController = require('../Controller/cookBookController');
 const AppController = require('../Controller/appController');
+const ForumController = require('../Controller/forumsController')
+const GroupController = require('../Controller/groupController')
+const GroupPanelController = require('../Controller/groupPanelController')
+const privateGroupController = require('../Controller/privateGroupController')
+
+
+
 
 const router = require('express').Router()
 
@@ -15,11 +22,17 @@ router.post('/user', UserController.postCreateUser);
 // POST /api/users/login
 router.post('/user/login', UserController.getLogIn);
 
-//post the updated user
-router.post('/user/edit/:id', UserController.postUpdatedUser);
+//update user
+router.post('/user/edit/', UserController.postCreateUser);
 
 //post the updated user
 router.get('/user/:id', UserController.getAUserByID);
+
+// Login Google
+router.post('/user/google/login', UserController.getGoogleLogIn);
+
+// Forgotten Password
+router.post('/user/forgottenPassword/login', UserController.PostForgottenPassword);
 
 
 
@@ -68,9 +81,6 @@ router.post('/recipe/removeRecipe/:id', RecipeController.postDeleteARecipe);
 //generate PDF
 router.post('/recipe/generateBook/:userId', CookBookController.createRecipeBookPDF);
 
-//get Data for PDF generation - FrontEnd
-// router.post('/recipe/generateCookBook/:userId', CookBookController.getDataForPDF);
-
 
 // Review
 //post new user review 
@@ -83,7 +93,40 @@ router.post('/review/recipe', ReviewController.postReview);
 router.post('/autoComplete', AppController.getAutoComplete)
 
 
+//ForumRooms
+// post forum = create and update
+router.post('/forum', ForumController.postForum);
 
+// get all groups in a forum
+router.post('/forums', ForumController.getForums);
+
+
+//GroupRooms
+// post group = create and update
+router.post('/group', GroupController.postGroup);
+
+// get all groups in a forum
+router.post('/groups', GroupController.getGroups);
+
+// get single group by Id
+router.get('/group/:groupId', GroupController.getSingleGroup);
+
+// Join Group Request
+router.post('/group/request', GroupController.postRequestToJoinOrLeaveGroup);
+
+// Approve Group Request
+router.post('/group/approve', GroupController.approveJoinRequest);
+
+// create private group
+router.post('/group/private', privateGroupController.postPrivateGroup);
+
+
+// Post
+// post Panel Discussion
+router.post('/panel', GroupPanelController.postGroupDiscussion);
+
+// get all  discussion panels in a group
+router.post('/panel/discussions', GroupPanelController.getGroupDiscussionPanels);
 
 
 
