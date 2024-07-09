@@ -3,6 +3,7 @@ const Chat = require('../models/chat.model');
 const ChatRoom = require('../models/chatRoom.model');
 const PrivateGroup = require('../../Model/privateGroup');
 const { getRandomInt } = require('../../Utils/common');
+const User = require('../../Model/user')
 
 module.exports = (io, socket) => {
   // Private Chat List
@@ -221,4 +222,36 @@ module.exports = (io, socket) => {
       console.log(error);
     }
   });
+
+  socket.on('addToPrivateGroup', async(data) => {
+    try {
+      console.log(data)
+      const {email, groupId} = data;
+
+      const user = await User.findOne({email});
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const group = await PrivateGroup.findById(groupId)
+      if (!group) {
+        throw new Error('Group not found');
+      }
+
+      group.groupMembers.push(user._id);
+      await group.save();
+
+      await PrivateGroup.populate(group, {
+        path: ' groupMembers',
+        select: '_id firstName lastName avatar',
+      });
+
+      console.log(group.groupMembers)
+
+      socket.emit('newMemberAdded', group.groupMembers);
+
+    } catch (error) {
+      console.log(error)
+    }
+  })
 };
