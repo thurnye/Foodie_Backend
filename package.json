@@ -24,6 +24,7 @@
     "nodemon": "^3.1.0",
     "pdf-merger-js": "^5.1.1",
     "puppeteer": "^22.10.0",
+    "redis": "^4.6.15",
     "socket.io": "^4.7.5"
   },
   "devDependencies": {

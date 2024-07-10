@@ -3,6 +3,7 @@ const User = require('../Model/user');
 const Review = require('../Model/review');
 const jwt = require('jsonwebtoken');
 const AutoComplete = require('../Model/autoComplete');
+const redisClient = require('../Utils/redisClient');
 
 //Create New Recipe
 const postRecipe = async (req, res, next) => {
@@ -71,10 +72,12 @@ const getAUserRecipes = async (req, res, next) => {
   try {
     console.log(req.body);
     const author = req.params.id;
-    const count = await Recipe.find({ author: author }).countDocuments();
-    // console.log(count);
     const perPage = req.body.perPage || 9;
     const page = req.body.currentPage || 1;
+    const cacheKey = `recipes:${author}_${perPage}_${page}`;
+
+    const count = await Recipe.find({ author: author }).countDocuments();
+    // console.log(count);
     const skip = req.body.skip;
     const isScrollLoad = req.body.isScrollLoad;
 
@@ -87,6 +90,10 @@ const getAUserRecipes = async (req, res, next) => {
       recipes,
       count: Math.ceil(count),
     };
+
+    // Cache the data in Redis
+    await redisClient.set(cacheKey, JSON.stringify(data), { EX: 3600 }); // Cache for 1 hour
+
     res.status(200).json(data);
   } catch (err) {
     console.log(err);
@@ -99,8 +106,10 @@ const getAllRecipes = async (req, res, next) => {
   try {
     console.log(req.body);
     // const count = await Recipe.find().countDocuments();
-    const perPage = 9;
-    const page = req.body.currentPage;
+    const perPage = req.body.perPage || 9;
+    const page = req.body.currentPage || 1;
+    const cacheKey = `recipes:all_${perPage}_${page}`;
+
     const recipes = await Recipe.find({})
       .skip(perPage * page - perPage)
       .limit(perPage)
@@ -113,6 +122,9 @@ const getAllRecipes = async (req, res, next) => {
       recipes,
       // count: Math.ceil(count / perPage),
     };
+    // Cache the data in Redis
+    await redisClient.set(cacheKey, JSON.stringify(data), { EX: 3 }); // 3mins
+
     res.status(200).json(data);
   } catch (err) {
     res.status(400).json(err);
@@ -122,32 +134,34 @@ const getAllRecipes = async (req, res, next) => {
 //RETRIEVE ALL  QUERY RECIPES
 const getQueryRecipes = async (req, res, next) => {
   try {
-    const filter = req.body.filter;
-    const categories = filter?.category;
-    const keyword = filter?.keywordSearch;
-    const tags = filter?.tags;
-    const perPage = 20;
-    const query = {};
-    const skip = req.body.skip;
     console.log(req.body);
+    let categories, tags, keyword;
+    const page = req.body.currentPage;
+    const query = {};
+    const isFilter = req.body.filter?.isFilter;
+    const perPage = 24;
+    const cacheKey = `recipes:all_${perPage}_${page}`;
 
-    // Save Category, Tags as strings[] not as an array of objects
-    const filteredCategories = categories.filter(
-      (element) => typeof element !== 'undefined'
-    );
+    if (req.body.filter?.isFilter) {
+      const filter = req.body.filter;
+      categories = filter?.categories;
+      keyword = filter?.keywordSearch;
+      tags = filter?.tags;
 
-    if (keyword) {
-      query['basicInfo.recipeName'] = new RegExp(keyword, 'i');
+      if (keyword) {
+        query['basicInfo.recipeName'] = new RegExp(keyword, 'i');
+      }
+      if (tags) {
+        query['basicInfo.tags.value'] = { $in: tags };
+      }
+      if (categories) {
+        query['basicInfo.categories.value'] = { $in: categories };
+      }
     }
-    if (tags) {
-      query['basicInfo.tags.value'] = { $in: tags };
-    }
-    if (filteredCategories.length > 0) {
-      query['basicInfo.categories.value'] = { $in: filteredCategories };
-    }
+
     const count = await Recipe.find(query).countDocuments();
     const recipes = await Recipe.find(query)
-      .skip(skip)
+      .skip(perPage * page - perPage)
       .limit(perPage)
       .select(
         '_id details.thumbnail basicInfo.recipeName basicInfo.level basicInfo.duration'
@@ -156,10 +170,16 @@ const getQueryRecipes = async (req, res, next) => {
 
     const data = {
       recipes,
-      count,
+      count: Math.ceil(count / perPage),
     };
+
+    if (!isFilter) {
+      await redisClient.set(cacheKey, JSON.stringify(data), { EX: 180 }); // 3 minutes
+    }
+
     res.status(200).json(data);
   } catch (err) {
+    console.log(err);
     res.status(400).json(err);
   }
 };
@@ -248,3 +268,4 @@ module.exports = {
   postDeleteARecipe,
   //   updateNewRecipe
 };
+
