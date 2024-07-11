@@ -1,0 +1,38 @@
+2024-07-11 16:26 -04:00: Server started on port 8670 and process id 83845
+2024-07-11 16:26 -04:00: Connected to Redis
+2024-07-11 16:26 -04:00: Database Connected..
+2024-07-11 16:27 -04:00: Server started on port 8670 and process id 84733
+2024-07-11 16:27 -04:00: Connected to Redis
+2024-07-11 16:27 -04:00: Database Connected..
+2024-07-11 16:27 -04:00: 6671d7e304d3b921c9082369
+2024-07-11 16:27 -04:00: [0mGET /group/6671d7e304d3b921c9082369 [36m304[0m 141.788 ms - -[0m
+2024-07-11 16:27 -04:00: 6671d7e304d3b921c9082369
+2024-07-11 16:27 -04:00: [0mGET /group/6671d7e304d3b921c9082369 [36m304[0m 131.035 ms - -[0m
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: User disconnected
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: User disconnected
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: User disconnected
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: User disconnected
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: User disconnected
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: User disconnected
+2024-07-11 16:27 -04:00: [0mOPTIONS /panel/discussions [32m200[0m 1.610 ms - 4[0m
+2024-07-11 16:27 -04:00: { currentPage: 1, perPage: 12, groupId: '6671d7e304d3b921c9082369' }
+2024-07-11 16:27 -04:00: [0mPOST /panel/discussions [32m200[0m 248.843 ms - 5216[0m
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: User disconnected
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: User disconnected
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: User disconnected
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: User disconnected
+2024-07-11 16:28 -04:00: User disconnected
+2024-07-11 16:28 -04:00: User disconnected

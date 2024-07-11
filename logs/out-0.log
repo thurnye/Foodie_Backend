@@ -1,0 +1,81 @@
+2024-07-11 16:25 -04:00: Connected to Redis
+2024-07-11 16:25 -04:00: Server started on port 8670 and process id 83835
+2024-07-11 16:26 -04:00: Database Connected..
+2024-07-11 16:26 -04:00: A user connected
+2024-07-11 16:26 -04:00: joinChatRoom event received: { userId: '612296fc86231100a0631b22', receiverId: '', roomId: null }
+2024-07-11 16:26 -04:00: joinChatRoom event received: { userId: '612296fc86231100a0631b22', receiverId: '', roomId: null }
+2024-07-11 16:26 -04:00: joinChatRoom event received: {
+  userId: '612296fc86231100a0631b22',
+  receiverId: '6687425d2e12a272f4147b14',
+  roomId: '6687425d2e12a272f4147b14'
+}
+2024-07-11 16:26 -04:00: joinChatRoom event received: {
+  userId: '612296fc86231100a0631b22',
+  receiverId: '667dc291e496205b4bae44ef',
+  roomId: '667dc291e496205b4bae44ef'
+}
+2024-07-11 16:26 -04:00: joinChatRoom event received: {
+  userId: '612296fc86231100a0631b22',
+  receiverId: '667ce3dec5a1641c8838db99',
+  roomId: '667ce415c5a1641c8838dbcc'
+}
+2024-07-11 16:26 -04:00: joinChatRoom event received: {
+  userId: '612296fc86231100a0631b22',
+  receiverId: '6676fd6e249999c6148445eb',
+  roomId: '667b5d16d886d08bcdb4e36a'
+}
+2024-07-11 16:26 -04:00: joinChatRoom event received: {
+  userId: '612296fc86231100a0631b22',
+  receiverId: '6687425d2e12a272f4147b14',
+  roomId: '6687425d2e12a272f4147b14'
+}
+2024-07-11 16:27 -04:00: Server started on port 8670 and process id 84708
+2024-07-11 16:27 -04:00: Connected to Redis
+2024-07-11 16:27 -04:00: Database Connected..
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: A user connected
+2024-07-11 16:27 -04:00: [0mOPTIONS /autoComplete [32m200[0m 6.424 ms - 4[0m
+2024-07-11 16:27 -04:00: [0mOPTIONS /forum/all [32m200[0m 1.999 ms - 4[0m
+2024-07-11 16:27 -04:00: [0mPOST /autoComplete [32m200[0m 98.470 ms - 1726[0m
+2024-07-11 16:27 -04:00: [0mPOST /forum/all [32m200[0m 117.709 ms - 491[0m
+2024-07-11 16:27 -04:00: [0mOPTIONS /group/all [32m200[0m 0.808 ms - 13[0m
+2024-07-11 16:27 -04:00: {
+  currentPage: 1,
+  perPage: 12,
+  forumId: '6671f570c367386008b040d9',
+  userId: '612296fc86231100a0631b22'
+}
+2024-07-11 16:27 -04:00: [0mPOST /group/all [32m200[0m 214.438 ms - 4196[0m
+2024-07-11 16:27 -04:00: [0mOPTIONS /panel/discussions [32m200[0m 4.596 ms - 4[0m
+2024-07-11 16:27 -04:00: { currentPage: 1, perPage: 12, groupId: '6671d7e304d3b921c9082369' }
+2024-07-11 16:27 -04:00: [0mPOST /panel/discussions [32m200[0m 203.813 ms - 5216[0m
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: User disconnected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: User disconnected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: User disconnected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: User disconnected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: User disconnected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: User disconnected
+2024-07-11 16:28 -04:00: User disconnected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: User disconnected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: User disconnected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: User disconnected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: A user connected
+2024-07-11 16:28 -04:00: A user connected
