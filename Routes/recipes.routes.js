@@ -18,10 +18,7 @@ router.post('/', RecipeCache.cacheAllRecipes ,RecipeController.getAllRecipes);
 router.post('/query', RecipeCache.cacheAllRecipes, RecipeController.getQueryRecipes);
 
 //getting a recipe by id
-router.get('/:id', RecipeController.getOneRecipe);
-
-//update a recipe by id
-// router.post('/recipe/update/:id', RecipeController.getRecipeUpdate);
+router.get('/:id', RecipeCache.cacheARecipe, RecipeController.getOneRecipe);
 
 //delete a recipe
 router.post('/removeRecipe/:id', RecipeController.postDeleteARecipe);

@@ -1,12 +1,12 @@
 const redisClient = require('../../Utils/redisClient');
 
-// Middleware to cache recipes by author ID
-const cacheUserRecipes = async (req, res, next) => {
+// Middleware to cache event by author ID
+const cacheUserEvents = async (req, res, next) => {
   try {
-    const author = req.params.id;
-    const perPage = req.body.perPage || 9;
-    const page = req.body.currentPage || 1;
-    const cacheKey = `recipes:${author}_${perPage}_${page}`;
+    const userId = req.params.id;
+    const perPage = 12;
+    const page = req.body.currentPage;
+    const cacheKey = `event:${userId}_${perPage}_${page}`;
 
     // Check if data exists in Redis
     const cachedData = await redisClient.get(cacheKey);
@@ -23,17 +23,14 @@ const cacheUserRecipes = async (req, res, next) => {
   }
 };
 
-// Middleware to cache all recipes 
-const cacheAllRecipes = async (req, res, next) => {
+// Middleware to cache all events
+const cacheAllEvents = async (req, res, next) => {
   try {
-    console.log("REDISCACHE", req.body)
-    if(req.body?.filter?.isFilter){
-      return next()
-    }
-    const author = req.params.id;
-    const perPage = 24;
-    const page = req.body.currentPage || 1;
-    const cacheKey = `recipes:all_${perPage}_${page}`;
+    console.log('REDISCACHE', req.body);
+    const filter = req.body;
+    const page = filter.page;
+    const limit = filter.limit || 12;
+    const cacheKey = `event:all_${limit}_${page}`;
 
     // Check if data exists in Redis
     const cachedData = await redisClient.get(cacheKey);
@@ -51,12 +48,10 @@ const cacheAllRecipes = async (req, res, next) => {
   }
 };
 
-
-const cacheARecipe = async (req, res, next) => {
+const cacheAnEvent = async (req, res, next) => {
   try {
-    
-    const recipeId = req.params.id;
-    const cacheKey = `recipes:${recipeId}`;
+    const eventId = req.params.id;
+    const cacheKey = `event:${eventId}`;
 
     // Check if data exists in Redis
     const cachedData = await redisClient.get(cacheKey);
@@ -75,7 +70,7 @@ const cacheARecipe = async (req, res, next) => {
 };
 
 module.exports = {
-  cacheUserRecipes,
-  cacheAllRecipes,
-  cacheARecipe
+  cacheUserEvents,
+  cacheAllEvents,
+  cacheAnEvent,
 };

@@ -22,7 +22,9 @@ const postRecipe = async (req, res, next) => {
     if (_id) {
       //update
       console.log('Updating....');
-      const recipe = await Recipe.findById(_id);
+      const recipeId = _id;
+      const cacheKey = `recipes:${recipeId}`;
+      const recipe = await Recipe.findById(recipeId);
       if (recipe.author.toString() === loggedUserId.toString()) {
         (recipe.basicInfo = basicInfo),
           (recipe.details = details),
@@ -31,6 +33,7 @@ const postRecipe = async (req, res, next) => {
           recipe.save();
       }
       data = recipe;
+      await redisClient.set(cacheKey, JSON.stringify(data), { EX: 300 });
     }
     if (!_id) {
       //create
@@ -58,7 +61,7 @@ const postRecipe = async (req, res, next) => {
     //     path: 'myRecipes.recipe',
     //   })
     //   .exec();
-
+    
     res.status(200).json(data._id);
   } catch (err) {
     console.log(err);
@@ -123,7 +126,7 @@ const getAllRecipes = async (req, res, next) => {
       // count: Math.ceil(count / perPage),
     };
     // Cache the data in Redis
-    await redisClient.set(cacheKey, JSON.stringify(data), { EX: 3 }); // 3mins
+    await redisClient.set(cacheKey, JSON.stringify(data), { EX: 180 }); // 3mins
 
     res.status(200).json(data);
   } catch (err) {
@@ -188,6 +191,8 @@ const getQueryRecipes = async (req, res, next) => {
 const getOneRecipe = async (req, res, next) => {
   try {
     const recipeId = req.params.id;
+    const cacheKey = `recipes:${recipeId}`;
+
     const recipeData = await Recipe.findById(recipeId)
       .populate({
         path: 'reviews.review',
@@ -209,11 +214,19 @@ const getOneRecipe = async (req, res, next) => {
       const average = sum / rating.length;
       recipeData.rating = average.toFixed(1);
       const recipe = await recipeData.save();
+
+      // Cache the data in Redis
+      await redisClient.set(cacheKey, JSON.stringify(recipe), { EX: 300 }); // 5mins
+
       res.status(200).json(recipe);
     } else {
+      // Cache the data in Redis
+      await redisClient.set(cacheKey, JSON.stringify(recipeData), { EX: 300 }); // 5mins
+
       res.status(200).json(recipeData);
     }
   } catch (err) {
+    console.log(err);
     res.status(400).json(err);
   }
 };
@@ -223,6 +236,7 @@ const postDeleteARecipe = async (req, res, next) => {
   try {
     // console.log(req.params.id)
     const recipeId = req.params.id;
+    const cacheKey = `recipes:${recipeId}`;
     let authorId = '';
 
     const recipe = await Recipe.findById(recipeId);
@@ -253,6 +267,10 @@ const postDeleteARecipe = async (req, res, next) => {
     const user = await foundUser.save();
 
     const token = jwt.sign({ user }, process.env.SECRET, { expiresIn: '24h' });
+
+    // Delete the cache entry
+    await redisClient.del(cacheKey);
+
     res.status(200).json(token);
   } catch (err) {
     res.status(400).json(err);
@@ -268,4 +286,3 @@ module.exports = {
   postDeleteARecipe,
   //   updateNewRecipe
 };
-

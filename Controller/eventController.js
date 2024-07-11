@@ -3,13 +3,14 @@ const Event = require('../Model/events');
 const jwt = require('jsonwebtoken');
 const HelperFunc = require('../Utils/common');
 const AutoComplete = require('../Model/autoComplete');
+const redisClient = require('../Utils/redisClient');
 
 const postEvent = async (req, res, next) => {
   try {
     const userId = req.body.userId;
     const eventForm = req.body.eventForm;
     const eventId = req.body.eventForm._id;
-
+    const cacheKey = `event:${eventId}`;
     console.log(userId, eventId, eventForm);
 
     const newEvent = new Event({
@@ -32,6 +33,9 @@ const postEvent = async (req, res, next) => {
       }
       const updatedEvent = await event.save();
       console.log('Updated');
+
+      await redisClient.set(cacheKey, JSON.stringify({event: updatedEvent}), { EX: 300 });
+      
       res.status(200).json({ event: updatedEvent });
     }
 
@@ -75,6 +79,7 @@ const getAllEvents = async (req, res, next) => {
     const timeFrameEnds = filter?.timeFrame?.ends;
     const limit = filter.limit || 12;
     let query = {};
+    const cacheKey = `event:all_${limit}_${page}`;
 
     if (keyword) {
       query['eventDetails.eventTitle'] = new RegExp(keyword, 'i');
@@ -125,6 +130,9 @@ const getAllEvents = async (req, res, next) => {
       count: Math.ceil(count / limit),
     };
     console.log(events.length);
+
+    await redisClient.set(cacheKey, JSON.stringify(data), { EX: 180 }); // 3 minutes
+
     res.status(200).json(data);
   } catch (err) {
     console.log(err);
@@ -137,11 +145,11 @@ const getUserEvents = async (req, res, next) => {
   try {
     console.log(req.body);
     const userId = req.params.id;
-    const count = await Event.find({ createdBy: userId }).countDocuments();
-    // console.log(count);
     const perPage = 12;
     const page = req.body.currentPage;
-
+    const cacheKey = `event:${userId}_${perPage}_${page}`;
+    
+    const count = await Event.find({ createdBy: userId }).countDocuments();
     const events = await Event.find({ createdBy: userId })
       .skip(perPage * page - perPage)
       .limit(perPage)
@@ -156,6 +164,9 @@ const getUserEvents = async (req, res, next) => {
       count: Math.ceil(count / perPage),
     };
     console.log(events.length);
+
+    await redisClient.set(cacheKey, JSON.stringify(data), { EX: 180 }); // Cache for 3 mins
+
     res.status(200).json(data);
   } catch (err) {
     res.status(400).json(err);
@@ -166,12 +177,17 @@ const getUserEvents = async (req, res, next) => {
 const getSingleEvent = async (req, res, next) => {
   try {
     const eventId = req.params.id;
+    const cacheKey = `event:${eventId}`;
+
     const event = await Event.findById(eventId)
       .populate({
         path: 'createdBy',
         select: '_id avatar lastName firstName followers',
       })
       .exec();
+
+      await redisClient.set(cacheKey, JSON.stringify(event), { EX: 300 }); // 5mins
+
     res.status(200).json(event);
   } catch (err) {
     res.status(400).json(err);
@@ -183,6 +199,7 @@ const postDeleteEvent = async (req, res, next) => {
   try {
     // console.log(req.params.id)
     const eventId = req.params.id;
+    const cacheKey = `event:${eventId}`;
     const event = await Event.findById(eventId);
     const organizerId = event.createdBy;
     //  delete recipe from author account
@@ -203,6 +220,10 @@ const postDeleteEvent = async (req, res, next) => {
     const user = await foundUser.save();
 
     const token = jwt.sign({ user }, process.env.SECRET, { expiresIn: '24h' });
+
+    // Delete the cache entry
+    await redisClient.del(cacheKey);
+
     res.status(200).json({ token, deleted: true });
   } catch (err) {
     res.status(400).json({ err, deleted: false });
