@@ -39,7 +39,7 @@ initializeSocket(server);
 
 // Start the server
 server.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
+  console.log(`Server started on port ${PORT} and process id ${process.pid}`);
 });
 
 mongoose.connect(process.env.DATABASE_URL)
