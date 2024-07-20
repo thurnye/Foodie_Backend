@@ -10,7 +10,7 @@ router.post('/add/:userId', RecipeController.postRecipe);
 
 //get the loggedIn user recipes
 // router.post('/user/:id',RecipeCache.cacheUserRecipes,  RecipeController.getAUserRecipes);
-router.post('/user/:id,  RecipeController.getAUserRecipes);
+router.post('/user/:id',  RecipeController.getAUserRecipes);
 
 //get all recipes
 // router.post('/', RecipeCache.cacheAllRecipes ,RecipeController.getAllRecipes);
