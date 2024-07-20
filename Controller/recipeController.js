@@ -3,7 +3,7 @@ const User = require('../Model/user');
 const Review = require('../Model/review');
 const jwt = require('jsonwebtoken');
 const AutoComplete = require('../Model/autoComplete');
-const redisClient = require('../Utils/redisClient');
+// const redisClient = require('../Utils/redisClient');
 
 //Create New Recipe
 const postRecipe = async (req, res, next) => {
@@ -33,7 +33,7 @@ const postRecipe = async (req, res, next) => {
           recipe.save();
       }
       data = recipe;
-      await redisClient.set(cacheKey, JSON.stringify(data), { EX: 300 });
+      // await redisClient.set(cacheKey, JSON.stringify(data), { EX: 300 });
     }
     if (!_id) {
       //create
@@ -95,7 +95,7 @@ const getAUserRecipes = async (req, res, next) => {
     };
 
     // Cache the data in Redis
-    await redisClient.set(cacheKey, JSON.stringify(data), { EX: 3600 }); // Cache for 1 hour
+    // await redisClient.set(cacheKey, JSON.stringify(data), { EX: 3600 }); // Cache for 1 hour
 
     res.status(200).json(data);
   } catch (err) {
@@ -126,7 +126,7 @@ const getAllRecipes = async (req, res, next) => {
       // count: Math.ceil(count / perPage),
     };
     // Cache the data in Redis
-    await redisClient.set(cacheKey, JSON.stringify(data), { EX: 180 }); // 3mins
+    // await redisClient.set(cacheKey, JSON.stringify(data), { EX: 180 }); // 3mins
 
     res.status(200).json(data);
   } catch (err) {
@@ -177,7 +177,7 @@ const getQueryRecipes = async (req, res, next) => {
     };
 
     if (!isFilter) {
-      await redisClient.set(cacheKey, JSON.stringify(data), { EX: 180 }); // 3 minutes
+      // await redisClient.set(cacheKey, JSON.stringify(data), { EX: 180 }); // 3 minutes
     }
 
     res.status(200).json(data);
@@ -216,12 +216,12 @@ const getOneRecipe = async (req, res, next) => {
       const recipe = await recipeData.save();
 
       // Cache the data in Redis
-      await redisClient.set(cacheKey, JSON.stringify(recipe), { EX: 300 }); // 5mins
+      // await redisClient.set(cacheKey, JSON.stringify(recipe), { EX: 300 }); // 5mins
 
       res.status(200).json(recipe);
     } else {
       // Cache the data in Redis
-      await redisClient.set(cacheKey, JSON.stringify(recipeData), { EX: 300 }); // 5mins
+      // await redisClient.set(cacheKey, JSON.stringify(recipeData), { EX: 300 }); // 5mins
 
       res.status(200).json(recipeData);
     }
@@ -269,7 +269,7 @@ const postDeleteARecipe = async (req, res, next) => {
     const token = jwt.sign({ user }, process.env.SECRET, { expiresIn: '24h' });
 
     // Delete the cache entry
-    await redisClient.del(cacheKey);
+    // await redisClient.del(cacheKey);
 
     res.status(200).json(token);
   } catch (err) {

@@ -3,7 +3,7 @@ const Event = require('../Model/events');
 const jwt = require('jsonwebtoken');
 const HelperFunc = require('../Utils/common');
 const AutoComplete = require('../Model/autoComplete');
-const redisClient = require('../Utils/redisClient');
+// const redisClient = require('../Utils/redisClient');
 
 const postEvent = async (req, res, next) => {
   try {
@@ -34,7 +34,7 @@ const postEvent = async (req, res, next) => {
       const updatedEvent = await event.save();
       console.log('Updated');
 
-      await redisClient.set(cacheKey, JSON.stringify({event: updatedEvent}), { EX: 300 });
+      // await redisClient.set(cacheKey, JSON.stringify({event: updatedEvent}), { EX: 300 });
       
       res.status(200).json({ event: updatedEvent });
     }
@@ -131,7 +131,7 @@ const getAllEvents = async (req, res, next) => {
     };
     console.log(events.length);
 
-    await redisClient.set(cacheKey, JSON.stringify(data), { EX: 180 }); // 3 minutes
+    // await redisClient.set(cacheKey, JSON.stringify(data), { EX: 180 }); // 3 minutes
 
     res.status(200).json(data);
   } catch (err) {
@@ -165,7 +165,7 @@ const getUserEvents = async (req, res, next) => {
     };
     console.log(events.length);
 
-    await redisClient.set(cacheKey, JSON.stringify(data), { EX: 180 }); // Cache for 3 mins
+    // await redisClient.set(cacheKey, JSON.stringify(data), { EX: 180 }); // Cache for 3 mins
 
     res.status(200).json(data);
   } catch (err) {
@@ -186,7 +186,7 @@ const getSingleEvent = async (req, res, next) => {
       })
       .exec();
 
-      await redisClient.set(cacheKey, JSON.stringify(event), { EX: 300 }); // 5mins
+      // await redisClient.set(cacheKey, JSON.stringify(event), { EX: 300 }); // 5mins
 
     res.status(200).json(event);
   } catch (err) {
@@ -222,7 +222,7 @@ const postDeleteEvent = async (req, res, next) => {
     const token = jwt.sign({ user }, process.env.SECRET, { expiresIn: '24h' });
 
     // Delete the cache entry
-    await redisClient.del(cacheKey);
+    // await redisClient.del(cacheKey);
 
     res.status(200).json({ token, deleted: true });
   } catch (err) {
